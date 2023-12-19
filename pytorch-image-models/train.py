@@ -1130,13 +1130,21 @@ def validate(
             recall[i] = confusion[i, i] / np.sum(confusion[:, i]) * 100
             precision[i] = confusion[i, i] / np.sum(confusion[i, :]) * 100
 
-    if precision.mean() + recall.mean() > 0:
-        f1score = 2 * (precision.mean()*recall.mean())/(precision.mean()+recall.mean())
-    
-
-    metrics = OrderedDict([('loss', losses_m.avg), ('top1', top1_m.avg), ('top5', top5_m.avg),
+    f1score = 0
+    if args.num_classes > 2:    
+        if precision.mean() + recall.mean() > 0:
+            f1score = 2 * (precision.mean()*recall.mean())/(precision.mean()+recall.mean())
+        metrics = OrderedDict([('loss', losses_m.avg), ('top1', top1_m.avg), ('top5', top5_m.avg),
                            ('precision', precision.mean()), ('recall', recall.mean()), ('f1score', f1score)])
 
+    else:
+        if precision[0] + recall[0] > 0:
+            f1score = 2 * (precision[0]*recall[0])/(precision[0]+recall[0])
+        metrics = OrderedDict([('loss', losses_m.avg), ('top1', top1_m.avg), ('top5', top5_m.avg),
+                           ('precision', precision[0]), ('recall', recall[0]), ('f1score', f1score)])
+    
+
+   
     _logger.info(' * Acc@1 {:.3f}. Acc@5 {:.3f}. Precision {:.3f} Recall {:.3f} F1 {:.3f} '.format(
        metrics['top1'], metrics['top5'], metrics['precision'], metrics['recall'], metrics['f1score']))
 

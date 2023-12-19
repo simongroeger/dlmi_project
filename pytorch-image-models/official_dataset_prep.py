@@ -107,11 +107,12 @@ def copy_images_all(source, dest, thresh):
 
 
 # data does not have predefined splits, create them
-def create_splits(src_dataset, src_trainset):
+def create_splits(src_dataset, src_trainset, ratio_train):
     
     print('Splitting images into train and val')
 
     cls_folder_list = os.listdir(os.path.join(src_dataset))
+    target_class_list = ['blood', 'other']
 
     # create new dirs at destination if necessary
     for split in ['split_0', 'split_1']:
@@ -121,7 +122,7 @@ def create_splits(src_dataset, src_trainset):
         except:
             pass
 
-        for cls_folder in cls_folder_list:
+        for cls_folder in target_class_list:
             try:
                 os.mkdir(os.path.join(src_trainset, split, cls_folder))
                 print('created directory')
@@ -133,7 +134,7 @@ def create_splits(src_dataset, src_trainset):
     for cls_folder in cls_folder_list: 
         img_list.append(os.listdir(os.path.join(src_dataset, cls_folder)))
 
-
+    # split according to csv
     for split in ['split_0', 'split_1']:
         print(split)
         # read split.csv data
@@ -159,10 +160,34 @@ def create_splits(src_dataset, src_trainset):
                             print('if file is duplicated: no problem')
                             continue
 
-                        dest_filepath = os.path.join(src_trainset, split, cls_folder, img_name)
+
+                        target_class = 'blood' if 'blood' in cls_folder else 'other'
+                        dest_filepath = os.path.join(src_trainset, split, target_class, img_name)
                         shutil.move(img_path_src, dest_filepath)
                 if not found:
                     print("Warning: file from csv not found", img_name)
+
+    # distribute remaining files
+    print("distrbute reaiming images equally")
+    for cls_folder in cls_folder_list: 
+        for split in ['split_0', 'split_1']:
+            img_list = os.listdir(os.path.join(src_dataset, cls_folder))
+
+            # move files with step given by ratio_train into val folder (i.e. every 5th image is val)
+            for i in range(0, len(img_list), int(1/(1-ratio_train)) if split == 'split_0' else 1 ):
+
+                img_name = img_list[i]
+
+                img_path_src = os.path.join(src_dataset, cls_folder, img_name)
+
+                if not os.path.isfile(img_path_src):
+                    print('val: Warning, not a file or does not exist: ' + img_path_src )
+                    continue
+
+                target_class = 'blood' if 'blood' in cls_folder else 'other'
+                dest_filepath = os.path.join(src_trainset, split, target_class, img_name)
+                shutil.move(img_path_src, dest_filepath)
+
 
 
     print('Finished splitting images into train and val')
@@ -184,5 +209,5 @@ if __name__ == '__main__' :
     # balance dataset
     copy_images_all(args.images_src + "/" + args.datadir, args.images_src+"/tmp", args.thresh)
 
-    create_splits(args.images_src+"/tmp", args.images_src)
+    create_splits(args.images_src+"/tmp", args.images_src, 0.5)
 
