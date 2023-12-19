@@ -67,7 +67,7 @@ parser.add_argument('--split', metavar='NAME', default='validation',
                     help='dataset split (default: validation)')
 parser.add_argument('--model', '-m', metavar='MODEL', default='resnet50',
                     help='model architecture (default: resnet50)')
-parser.add_argument('-j', '--workers', default=2, type=int, metavar='N',
+parser.add_argument('-j', '--workers', default=8, type=int, metavar='N',
                     help='number of data loading workers (default: 2)')
 parser.add_argument('-b', '--batch-size', default=256, type=int,
                     metavar='N', help='mini-batch size (default: 256)')

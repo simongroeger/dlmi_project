@@ -22,6 +22,7 @@ from collections import OrderedDict
 from contextlib import suppress
 from datetime import datetime
 from functools import partial
+import numpy as np
 
 import torch
 import torch.nn as nn
@@ -375,6 +376,34 @@ def _parse_args():
     return args, args_text
 
 
+def print_confusion(args, confusion, precision, recall):
+    print()
+    print("zeile = prediction , spalte = real , in Prozent")
+    print()
+    for i in range(args.num_classes):
+        for j in range(args.num_classes):
+            if confusion[i, j] < 100:
+                print(' ', end='')
+            if confusion[i, j] < 10:
+                print(' ', end='')
+            print('{:.2f} '.format(confusion[i, j]), end='')
+        print('| ', end='')
+        if precision[i] < 100:
+            print(' ', end='')
+        if precision[i] < 10:
+            print(' ', end='')
+        print('{:.2f} '.format(precision[i]))
+    print('---------------------------------------------------------------------------------------------------')
+    for i in range(args.num_classes):
+        if recall[i] < 100:
+            print(' ', end='')
+        if recall[i] < 10:
+            print(' ', end='')
+        print('{:.2f} '.format(recall[i]), end='')
+    print()
+    print()
+
+
 def main():
     utils.setup_default_logging()
     args, args_text = _parse_args()
@@ -382,6 +411,7 @@ def main():
     if torch.cuda.is_available():
         torch.backends.cuda.matmul.allow_tf32 = True
         torch.backends.cudnn.benchmark = True
+        print("cuda available")
 
     args.prefetcher = not args.no_prefetcher
     args.grad_accum_steps = max(1, args.grad_accum_steps)
@@ -393,6 +423,8 @@ def main():
     else:
         _logger.info(f'Training with a single process on 1 device ({args.device}).')
     assert args.rank >= 0
+
+    print("device", device.type)
 
     # resolve AMP arguments based on PyTorch / Apex availability
     use_amp = None
@@ -607,6 +639,9 @@ def main():
         download=args.dataset_download,
         batch_size=args.batch_size,
     )
+
+    print("Loaded data:", len(dataset_train), len(dataset_eval))
+
 
     # setup mixup / cutmix
     collate_fn = None
@@ -1006,7 +1041,6 @@ def train_one_epoch(
 
     return OrderedDict([('loss', losses_m.avg)])
 
-
 def validate(
         model,
         loader,
@@ -1020,6 +1054,10 @@ def validate(
     losses_m = utils.AverageMeter()
     top1_m = utils.AverageMeter()
     top5_m = utils.AverageMeter()
+    
+
+    confusion_count = 0
+    confusion = np.zeros((args.num_classes, args.num_classes))
 
     model.eval()
 
@@ -1047,11 +1085,13 @@ def validate(
 
                 loss = loss_fn(output, target)
             acc1, acc5 = utils.accuracy(output, target, topk=(1, 5))
+            tp, fp, fn, tn = utils.calc_tp_fp_fn_tn(output.detach(), target)
 
             if args.distributed:
                 reduced_loss = utils.reduce_tensor(loss.data, args.world_size)
                 acc1 = utils.reduce_tensor(acc1, args.world_size)
                 acc5 = utils.reduce_tensor(acc5, args.world_size)
+                
             else:
                 reduced_loss = loss.data
 
@@ -1061,6 +1101,11 @@ def validate(
             losses_m.update(reduced_loss.item(), input.size(0))
             top1_m.update(acc1.item(), output.size(0))
             top5_m.update(acc5.item(), output.size(0))
+            
+
+            current_count, current_confusion = utils.calc_confusion_matrix(output.detach(), target, args.num_classes)
+            confusion_count += current_count
+            confusion += current_confusion
 
             batch_time_m.update(time.time() - end)
             end = time.time()
@@ -1074,7 +1119,29 @@ def validate(
                     f'Acc@5: {top5_m.val:>7.3f} ({top5_m.avg:>7.3f})'
                 )
 
-    metrics = OrderedDict([('loss', losses_m.avg), ('top1', top1_m.avg), ('top5', top5_m.avg)])
+    confusion *= 100 / confusion_count
+
+    #for i confusion[pred[i], target[i]] += 1
+    precision = np.zeros((args.num_classes))
+    recall = np.zeros((args.num_classes))
+
+    for i in range(args.num_classes):
+        if confusion[i, i] > 0:
+            recall[i] = confusion[i, i] / np.sum(confusion[:, i]) * 100
+            precision[i] = confusion[i, i] / np.sum(confusion[i, :]) * 100
+
+    if precision.mean() + recall.mean() > 0:
+        f1score = 2 * (precision.mean()*recall.mean())/(precision.mean()+recall.mean())
+    
+
+    metrics = OrderedDict([('loss', losses_m.avg), ('top1', top1_m.avg), ('top5', top5_m.avg),
+                           ('precision', precision.mean()), ('recall', recall.mean()), ('f1score', f1score)])
+
+    _logger.info(' * Acc@1 {:.3f}. Acc@5 {:.3f}. Precision {:.3f} Recall {:.3f} F1 {:.3f} '.format(
+       metrics['top1'], metrics['top5'], metrics['precision'], metrics['recall'], metrics['f1score']))
+
+    print_confusion(args, confusion, precision, recall)
+
 
     return metrics
 
