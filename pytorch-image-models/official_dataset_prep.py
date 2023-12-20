@@ -12,6 +12,90 @@ import argparse
 import random
 import csv
 
+import cv2
+from numpy.lib import index_tricks
+
+
+def shear_image(image, o_shear_x, o_shear_y):
+    shear_x = abs(o_shear_x)
+    shear_y = abs(o_shear_y)
+    M = np.float32([[1, shear_x, 0],
+                    [shear_y, 1  , 0],
+                    [0, 0  , 1]])
+    rows_prev, cols_prev, dim = image.shape
+    rows = rows_prev + shear_y*cols_prev
+    cols = cols_prev + shear_x*rows_prev
+    
+    img = image
+    if o_shear_x< 0: img =  cv2.flip(img, 0)      
+    if o_shear_y< 0: img =  cv2.flip(img, 1)      
+    img = cv2.warpPerspective(img,M,(int(cols),int(rows)), borderMode=cv2.BORDER_REPLICATE)
+    if o_shear_x< 0: img =  cv2.flip(img, 0)      
+    if o_shear_y< 0: img =  cv2.flip(img, 1) 
+    return img
+
+
+
+def rotate_image(image, angle):
+    image_center = tuple(np.array(image.shape[1::-1]) / 2)
+    rot_mat = cv2.getRotationMatrix2D(image_center, angle, 1.0)
+    result = cv2.warpAffine(image, rot_mat, image.shape[1::-1], flags=cv2.INTER_LINEAR)
+    return result
+
+
+
+def transform(path, degrees, shears):
+    img = cv2.imread(path)
+    count = 0
+    for degree in degrees:
+        cv2.imwrite(path[:-4] + "_rot_" + str(degree) + ".png", rotate_image(img, degree))
+        count += 1
+    
+    for shear_x in shears:
+        for shear_y in shears:
+            if shear_x != 0 or shear_y != 0:
+                cv2.imwrite(path[:-4] + "_shear_"+("%.2f" % round(shear_x, 2))+ "_" + ("%.2f" % round(shear_y, 2)) + ".png", shear_image(img, shear_x, shear_y))
+                count += 1
+
+    return count
+
+
+
+def fillup_splitted_folder(dir, class_folder, thresh):
+    img_list = os.listdir(os.path.join(dir, class_folder))
+    img_count = len(img_list)
+    amount =  thresh - img_count
+    print(class_folder, "got", img_count, "needs", amount)
+
+    i = 0
+    for img in img_list:
+        additional = transform(os.path.join(dir, class_folder, img), degrees=[-2, 2], shears=[-0.05, 0, 0.05])
+        i+=additional
+        if i > amount:
+            return
+    for img in img_list:
+        additional = transform(os.path.join(dir, class_folder, img), degrees=[-10, -5, 5, 10], shears=[-0.1, 0, 0.1])
+        i += additional
+        if i > amount:
+            return
+       
+
+
+def fillup_splitted(dir):
+    class_list = os.listdir(dir)
+    print("fillup", len(class_list))
+
+    img_count = []
+    for class_folder in class_list:
+        img_count.append(len(os.listdir(os.path.join(dir, class_folder))))
+
+    min_class_i = img_count.index(min(img_count))
+
+    fillup_splitted_folder(dir, class_list[min_class_i], max(img_count))
+
+    print("finished filling up")
+
+
 
 
 
@@ -76,7 +160,7 @@ def copy_image_folder(source, dest, class_folder, thresh):
 
 
 #copy all data to custom dataset
-def copy_images_all(source, dest, thresh):
+def copy_images_all(source, dest, thresh=1000000):
 
     print('Copying images to ' + dest + ' from: '+ source)
 
@@ -107,7 +191,7 @@ def copy_images_all(source, dest, thresh):
 
 
 # data does not have predefined splits, create them
-def create_splits(src_dataset, src_trainset, ratio_train):
+def create_splits(src_dataset, src_trainset, thresh, ratio_train):
     
     print('Splitting images into train and val')
 
@@ -129,13 +213,14 @@ def create_splits(src_dataset, src_trainset, ratio_train):
             except:
                 pass
 
+    class_count = np.zeros((2, len(cls_folder_list)))
 
     img_list = []
     for cls_folder in cls_folder_list: 
         img_list.append(os.listdir(os.path.join(src_dataset, cls_folder)))
 
     # split according to csv
-    for split in ['split_0', 'split_1']:
+    for split_i, split in enumerate(['split_0', 'split_1']):
         print(split)
         # read split.csv data
         with open(src_trainset + "/" + split + ".csv", newline='') as csvfile:
@@ -160,6 +245,10 @@ def create_splits(src_dataset, src_trainset, ratio_train):
                             print('if file is duplicated: no problem')
                             continue
 
+                        if class_count[split_i, cls_i] > thresh:
+                            continue
+                        else:
+                            class_count[split_i, cls_i] += 1
 
                         target_class = 'blood' if 'blood' in cls_folder else 'other'
                         dest_filepath = os.path.join(src_trainset, split, target_class, img_name)
@@ -169,8 +258,8 @@ def create_splits(src_dataset, src_trainset, ratio_train):
 
     # distribute remaining files
     print("distrbute reaiming images equally")
-    for cls_folder in cls_folder_list: 
-        for split in ['split_0', 'split_1']:
+    for cls_i, cls_folder in enumerate(cls_folder_list): 
+        for split_i, split in enumerate(['split_0', 'split_1']):
             img_list = os.listdir(os.path.join(src_dataset, cls_folder))
 
             # move files with step given by ratio_train into val folder (i.e. every 5th image is val)
@@ -183,6 +272,11 @@ def create_splits(src_dataset, src_trainset, ratio_train):
                 if not os.path.isfile(img_path_src):
                     print('val: Warning, not a file or does not exist: ' + img_path_src )
                     continue
+
+                if class_count[split_i, cls_i] > thresh:
+                            continue
+                else:
+                    class_count[split_i, cls_i] += 1
 
                 target_class = 'blood' if 'blood' in cls_folder else 'other'
                 dest_filepath = os.path.join(src_trainset, split, target_class, img_name)
@@ -198,7 +292,7 @@ if __name__ == '__main__' :
 
     # user input
     parser = argparse.ArgumentParser()
-    parser.add_argument('--thresh', type=int, default=100000, help='maximum number of images per class')
+    parser.add_argument('--thresh', type=int, default=1000, help='maximum number of images per class')
     parser.add_argument('--images-src', type=str, default='/home/simon/dlmi_project/pytorch-image-models/images', \
         help='path to directory where images are in all')
     parser.add_argument('--datadir', type=str, default="all")
@@ -207,7 +301,10 @@ if __name__ == '__main__' :
     print(args)
 
     # balance dataset
-    copy_images_all(args.images_src + "/" + args.datadir, args.images_src+"/tmp", args.thresh)
+    copy_images_all(args.images_src + "/" + args.datadir, args.images_src+"/tmp")
 
-    create_splits(args.images_src+"/tmp", args.images_src, 0.5)
+    create_splits(args.images_src+"/tmp", args.images_src, args.thresh, 0.5)
+
+    fillup_splitted(args.images_src+"/split_1")
+
 

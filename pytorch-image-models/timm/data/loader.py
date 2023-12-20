@@ -12,6 +12,8 @@ from functools import partial
 from itertools import repeat
 from typing import Callable
 
+from numpy.core.numeric import full
+
 import torch
 import torch.utils.data
 import numpy as np
@@ -221,6 +223,7 @@ def create_loader(
         use_multi_epochs_loader=False,
         persistent_workers=True,
         worker_seeding='all',
+        weights=None
 ):
     re_num_splits = 0
     if re_split:
@@ -268,6 +271,15 @@ def create_loader(
             sampler = OrderedDistributedSampler(dataset)
     else:
         assert num_aug_repeats == 0, "RepeatAugment not currently supported in non-distributed or IterableDataset use"
+
+    if is_training and weights != None:
+        full_weights = np.zeros(len(dataset))
+        index = 0
+        for i in range(len(dataset)):
+            full_weights[i] = weights[0] if i < weights[0] else weights[1]
+        sampler = torch.utils.data.WeightedRandomSampler(full_weights, len(dataset), replacement=True)
+
+    #sampler = torch.utils.data.RandomSampler(dataset, True, len(dataset))
 
     if collate_fn is None:
         collate_fn = fast_collate if use_prefetcher else torch.utils.data.dataloader.default_collate

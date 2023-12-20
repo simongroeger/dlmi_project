@@ -241,7 +241,7 @@ group.add_argument('--ratio', type=float, nargs='+', default=[3. / 4., 4. / 3.],
                    help='Random resize aspect ratio (default: 0.75 1.33)')
 group.add_argument('--hflip', type=float, default=0.5,
                    help='Horizontal flip training aug probability')
-group.add_argument('--vflip', type=float, default=0.,
+group.add_argument('--vflip', type=float, default=0.5,
                    help='Vertical flip training aug probability')
 group.add_argument('--color-jitter', type=float, default=0.4, metavar='PCT',
                    help='Color jitter factor (default: 0.4)')
@@ -257,7 +257,7 @@ group.add_argument('--bce-loss', action='store_true', default=False,
                    help='Enable BCE loss w/ Mixup/CutMix use.')
 group.add_argument('--bce-target-thresh', type=float, default=None,
                    help='Threshold for binarizing softened BCE targets (default: None, disabled)')
-group.add_argument('--reprob', type=float, default=0., metavar='PCT',
+group.add_argument('--reprob', type=float, default=0.2, metavar='PCT',
                    help='Random erase prob (default: 0.)')
 group.add_argument('--remode', type=str, default='pixel',
                    help='Random erase mode (default: "pixel")')
@@ -348,7 +348,7 @@ group.add_argument('--output', default='', type=str, metavar='PATH',
                    help='path to output folder (default: none, current dir)')
 group.add_argument('--experiment', default='', type=str, metavar='NAME',
                    help='name of train experiment, name of sub-folder for output')
-group.add_argument('--eval-metric', default='top1', type=str, metavar='EVAL_METRIC',
+group.add_argument('--eval-metric', default='f1score', type=str, metavar='EVAL_METRIC',
                    help='Best metric (default: "top1"')
 group.add_argument('--tta', type=int, default=0, metavar='N',
                    help='Test/inference time augmentation (oversampling) factor. 0=None (default: 0)')
@@ -630,6 +630,15 @@ def main():
         repeats=args.epoch_repeats,
     )
 
+    cls_weight = []
+    cls_folder_list = os.listdir(os.path.join(args.data_dir, args.train_split))
+    for cls_folder in cls_folder_list: 
+        cls_weight.append(1.0 / len(os.listdir(os.path.join(args.data_dir, args.train_split, cls_folder))))
+
+    train_class_weight = torch.tensor(cls_weight).to(device)
+    train_class_weight = train_class_weight / train_class_weight.sum().item()
+    print("train class imbalance", train_class_weight)
+
     dataset_eval = create_dataset(
         args.dataset,
         root=args.data_dir,
@@ -739,7 +748,7 @@ def main():
         else:
             train_loss_fn = LabelSmoothingCrossEntropy(smoothing=args.smoothing)
     else:
-        train_loss_fn = nn.CrossEntropyLoss()
+        train_loss_fn = nn.CrossEntropyLoss(weights=train_class_weight)
     train_loss_fn = train_loss_fn.to(device=device)
     validate_loss_fn = nn.CrossEntropyLoss().to(device=device)
 
@@ -910,6 +919,7 @@ def train_one_epoch(
     update_time_m = utils.AverageMeter()
     data_time_m = utils.AverageMeter()
     losses_m = utils.AverageMeter()
+    class_balance_m = utils.AverageMeter()
 
     model.train()
 
@@ -929,6 +939,8 @@ def train_one_epoch(
         update_idx = batch_idx // accum_steps
         if batch_idx >= last_batch_idx_to_accum:
             accum_steps = last_accum_steps
+
+        class_balance_m.update(target.sum().item()/ target.size(0))
 
         if not args.prefetcher:
             input, target = input.to(device), target.to(device)
@@ -1014,7 +1026,8 @@ def train_one_epoch(
                     f'Time: {update_time_m.val:.3f}s, {update_sample_count / update_time_m.val:>7.2f}/s  '
                     f'({update_time_m.avg:.3f}s, {update_sample_count / update_time_m.avg:>7.2f}/s)  '
                     f'LR: {lr:.3e}  '
-                    f'Data: {data_time_m.val:.3f} ({data_time_m.avg:.3f})'
+                    f'Data: {data_time_m.val:.3f} ({data_time_m.avg:.3f})  '
+                    f'class: {class_balance_m.val:.3f}({class_balance_m.avg:.3f})'
                 )
 
                 if args.save_images and output_dir:
@@ -1035,6 +1048,7 @@ def train_one_epoch(
         update_sample_count = 0
         data_start_time = time.time()
         # end for
+
 
     if hasattr(optimizer, 'sync_lookahead'):
         optimizer.sync_lookahead()
