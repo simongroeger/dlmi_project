@@ -18,10 +18,12 @@ from collections import OrderedDict
 from contextlib import suppress
 from functools import partial
 
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.parallel
 
+from timm import utils
 from timm.data import create_dataset, create_loader, resolve_data_config, RealLabelsImagenet
 from timm.layers import apply_test_time_pool, set_fast_norm
 from timm.models import create_model, load_checkpoint, is_model, list_models
@@ -291,6 +293,10 @@ def validate(args):
     top1 = AverageMeter()
     top5 = AverageMeter()
 
+    confusion_count = 0
+    confusion = np.zeros((args.num_classes, args.num_classes))
+
+
     model.eval()
     with torch.no_grad():
         # warmup, reduce variability of first batch time, especially for comparing torchscript vs non
@@ -325,6 +331,11 @@ def validate(args):
             top1.update(acc1.item(), input.size(0))
             top5.update(acc5.item(), input.size(0))
 
+            current_count, current_confusion = utils.calc_confusion_matrix(output.detach(), target, args.num_classes)
+            confusion_count += current_count
+            confusion += current_confusion
+
+
             # measure elapsed time
             batch_time.update(time.time() - end)
             end = time.time()
@@ -351,6 +362,20 @@ def validate(args):
         top1a, top5a = real_labels.get_accuracy(k=1), real_labels.get_accuracy(k=5)
     else:
         top1a, top5a = top1.avg, top5.avg
+
+    confusion *= 100 / confusion_count
+
+    #for i confusion[pred[i], target[i]] += 1
+    precision = np.zeros((args.num_classes))
+    recall = np.zeros((args.num_classes))
+
+    for i in range(args.num_classes):
+        if confusion[i, i] > 0:
+            recall[i] = confusion[i, i] / np.sum(confusion[:, i]) * 100
+            precision[i] = confusion[i, i] / np.sum(confusion[i, :]) * 100
+    if precision[0] + recall[0] > 0:
+        f1score = 2 * (precision[0]*recall[0])/(precision[0]+recall[0])
+    
     results = OrderedDict(
         model=args.model,
         top1=round(top1a, 4), top1_err=round(100 - top1a, 4),
@@ -359,10 +384,13 @@ def validate(args):
         img_size=data_config['input_size'][-1],
         crop_pct=crop_pct,
         interpolation=data_config['interpolation'],
+        precision=precision[0],
+        recall=recall[0],
+        f1score=f1score
     )
 
-    _logger.info(' * Acc@1 {:.3f} ({:.3f}) Acc@5 {:.3f} ({:.3f})'.format(
-       results['top1'], results['top1_err'], results['top5'], results['top5_err']))
+    _logger.info(' * Acc@1 {:.3f}. Acc@5 {:.3f}. Precision {:.3f} Recall {:.3f} F1 {:.3f} '.format(
+       results['top1'], results['top5'], results['precision'], results['recall'], results['f1score']))
 
     return results
 

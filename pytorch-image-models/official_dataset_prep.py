@@ -191,7 +191,7 @@ def copy_images_all(source, dest, thresh=1000000):
 
 
 # data does not have predefined splits, create them
-def create_splits(src_dataset, src_trainset, thresh, ratio_train):
+def create_splits(src_dataset, src_trainset, train_split, thresh, ratio_train):
     
     print('Splitting images into train and val')
 
@@ -245,7 +245,8 @@ def create_splits(src_dataset, src_trainset, thresh, ratio_train):
                             print('if file is duplicated: no problem')
                             continue
 
-                        if class_count[split_i, cls_i] > thresh:
+                        if class_count[split_i, cls_i] > thresh and split == train_split:
+                            os.remove(img_path_src)
                             continue
                         else:
                             class_count[split_i, cls_i] += 1
@@ -273,7 +274,7 @@ def create_splits(src_dataset, src_trainset, thresh, ratio_train):
                     print('val: Warning, not a file or does not exist: ' + img_path_src )
                     continue
 
-                if class_count[split_i, cls_i] > thresh:
+                if class_count[split_i, cls_i] > thresh and split == train_split:
                             continue
                 else:
                     class_count[split_i, cls_i] += 1
@@ -300,11 +301,13 @@ if __name__ == '__main__' :
     args = parser.parse_args()
     print(args)
 
+    train_split = "split_0"
+
     # balance dataset
     copy_images_all(args.images_src + "/" + args.datadir, args.images_src+"/tmp")
 
-    create_splits(args.images_src+"/tmp", args.images_src, args.thresh, 0.5)
+    create_splits(args.images_src+"/tmp", args.images_src, train_split, args.thresh, 0.5)
 
-    fillup_splitted(args.images_src+"/split_1")
+    fillup_splitted(args.images_src+"/"+train_split)
 
 
