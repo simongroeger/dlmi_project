@@ -325,7 +325,7 @@ if __name__ == '__main__' :
     # user input
     parser = argparse.ArgumentParser()
     parser.add_argument('--thresh', type=int, default=100000, help='maximum number of images per class')
-    parser.add_argument('--images-src', type=str, default='/home/simon/dlmi_project/pytorch-image-models/images', \
+    parser.add_argument('--images-src', type=str, default='.\images',
         help='path to directory where images are in all')
     parser.add_argument('--datadir', type=str, default="all")
 
@@ -333,18 +333,18 @@ if __name__ == '__main__' :
     print(args)
 
     # some image folders may be empty
-    clear_empty_cls(args.images_src + "/" + args.datadir)
+    clear_empty_cls(args.images_src + "\\" + args.datadir)
 
     # balance dataset
-    copy_images_all(args.images_src + "/" + args.datadir, args.images_src+"/tmp", args.thresh)
+    copy_images_all(args.images_src + "\\" + args.datadir, args.images_src+ "\\tmp", args.thresh)
 
-    #fillup_other_with_random(args.images_src+"/tmp")
-    # create_random_unknown(args.images_src+"/tmp")
+    #fillup_other_with_random(args.images_src+"\\tmp")
+    # create_random_unknown(args.images_src+"\\tmp")
 
     # create data splits for all maas_custom folders
-    create_splits(args.images_src+"/tmp", args.images_src, 0.8)
+    create_splits(args.images_src+ "\\tmp", args.images_src, 0.8)
 
-    #fillup_splitted(args.images_src+"/train", args.thresh * 0.8)
-    #fillup_splitted(args.images_src+"/validation", args.thresh * 0.2)
+    #fillup_splitted(args.images_src+"\\train", args.thresh * 0.8)
+    #fillup_splitted(args.images_src+"\\validation", args.thresh * 0.2)
 
 
