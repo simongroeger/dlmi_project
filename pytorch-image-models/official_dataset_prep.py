@@ -294,7 +294,7 @@ if __name__ == '__main__' :
     # user input
     parser = argparse.ArgumentParser()
     parser.add_argument('--thresh', type=int, default=1000, help='maximum number of images per class')
-    parser.add_argument('--images-src', type=str, default='/home/simon/dlmi_project/pytorch-image-models/images', \
+    parser.add_argument('--images-src', type=str, default='./images',
         help='path to directory where images are in all')
     parser.add_argument('--datadir', type=str, default="all")
 
