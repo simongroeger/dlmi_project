@@ -7,6 +7,7 @@ def load_image(image_path):
     """Load image"""
 
     image = cv2.imread(image_path)
+    image = image / 255.0
 
     return image
 

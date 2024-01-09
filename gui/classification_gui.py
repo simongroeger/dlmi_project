@@ -296,7 +296,7 @@ def classify_image(root, sample_field, neural_network_selected, baseline_selecte
         image_class_1 = ""
         image_class_2 = ""
         if neural_network_selected.get() == 1:
-            image_class_1 = "Neural Network prediction: "+nn_classify(fpath, "")
+            image_class_1 = "Neural Network prediction: "+nn_classify(fpath)
         if baseline_selected.get() == 1:
             image_class_2 = "Baseline prediciton: "+baseline_classify(fpath)
         if neural_network_selected.get() == 0 and baseline_selected.get() == 0:
