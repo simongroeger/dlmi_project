@@ -5,11 +5,9 @@
 from classification_gui import *
 def classification_gui():
     """Classification GUI"""
-
-    path_1 = "Data/labelled_images/ampulla_of_vater/Ampulla_of_vater"
-    path_2 = "Data/labelled_images/blood_-_fresh/Blood_fresh"
-    data_path = "Data/labelled_images"
-    metadata_path = "Data/metadata.csv"
+    
+    data_path = "pytorch-image-models/images/all"
+    metadata_path = "pytorch-image-models/images/metadata.csv"
     # dl_model = load_model()
 
     # image_data = load_data(path_1, path_2)

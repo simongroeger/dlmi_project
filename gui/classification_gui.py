@@ -231,11 +231,15 @@ def display_image_data(root, fname, image_class, metadata_path, image_data_field
 
     # set additional img data text
     df = pd.read_csv(metadata_path, sep=";")
-    d = df[df["filename"].str.match(fname) & df["finding_class"].str.match(image_class)]
-    data = "Filename: {0}\nVideo_id: {1}\nFrame_number: {2}\nFinding_category: {3}\nFinding_class: {4}\nX1: {5}\nY1: {6}\nX2: {7}\nY2: {8}\nX3: {9}\nY3: {10}\nX4: {11}\nY4: {12}"\
-        .format(d.iloc[0,0], d.iloc[0,1], d.iloc[0,2], d.iloc[0,3], d.iloc[0,4], d.iloc[0,5], d.iloc[0,6], d.iloc[0,7], d.iloc[0,8], d.iloc[0,9], d.iloc[0,10], d.iloc[0,11], d.iloc[0,12])
+    # TODO mapping finding_class to csv
+    d = df[df["filename"].str.match(fname) & df["finding_class"].str.match(image_class, False)]
     image_data_field.delete("1.0","end")
-    image_data_field.insert(END, data)
+
+    if not d.empty:
+        data = "Filename: {0}\nVideo_id: {1}\nFrame_number: {2}\nFinding_category: {3}\nFinding_class: {4}\nX1: {5}\nY1: {6}\nX2: {7}\nY2: {8}\nX3: {9}\nY3: {10}\nX4: {11}\nY4: {12}"\
+            .format(d.iloc[0,0], d.iloc[0,1], d.iloc[0,2], d.iloc[0,3], d.iloc[0,4], d.iloc[0,5], d.iloc[0,6], d.iloc[0,7], d.iloc[0,8], d.iloc[0,9], d.iloc[0,10], d.iloc[0,11], d.iloc[0,12])
+        image_data_field.insert(END, data)
+    image_data_field.insert(END, "No additional data found")
 
 
 def select_algorithm(root):
@@ -290,7 +294,7 @@ def classify_image(root, sample_field, neural_network_selected, baseline_selecte
     def prediction():
 
         # get filepath from sample field
-        fpath = sample_field.get()
+        fpath = sample_field.get("1.0",END)[:-1]
 
         # predict image class
         image_class_1 = ""
