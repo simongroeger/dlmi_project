@@ -4,7 +4,8 @@ import torch
 from timm.models import create_model
 
 
-
+imagenet_mean = np.array([0.485, 0.456, 0.406])
+imagenet_stddev = np.array([0.229, 0.224, 0.225])
 
 
 model = None
@@ -34,7 +35,7 @@ def load_image(image_path):
 
     image = cv2.imread(image_path)
     resized_image = cv2.resize(image, dsize=(288, 288), interpolation=cv2.INTER_LINEAR)
-    resized_image = resized_image / 255.0
+    resized_image = resized_image
 
     return resized_image
 
@@ -49,10 +50,13 @@ def nn_classify(image_path):
     image = load_image(image_path)
 
     # create torch tensor
-    torch_image = torch.from_numpy(image).float()
+
+    normalized_image = (image/255.0 - imagenet_mean) / imagenet_stddev
+    
+    torch_image = torch.from_numpy(normalized_image).float()
     torch_image = torch_image.unsqueeze(0)
     torch_image = torch_image.permute((0, 3, 1, 2))
-    
+
     # predict image class
     output = model(torch_image).softmax(-1)
     output, indices = output.topk(1)

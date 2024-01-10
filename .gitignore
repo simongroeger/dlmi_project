@@ -162,3 +162,4 @@ cython_debug/
 
 pytorch-image-models/images
 pytorch-image-models/output
+.vscode/settings.json

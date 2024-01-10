@@ -7,7 +7,6 @@ def load_image(image_path):
     """Load image"""
 
     image = cv2.imread(image_path)
-    image = image / 255.0
 
     return image
 
@@ -19,7 +18,7 @@ def baseline_classify(image_path):
 
     # predict image class
 
-    hsv_image = matplotlib.colors.rgb_to_hsv(image)
+    hsv_image = matplotlib.colors.rgb_to_hsv(image / 255.0)
     average_h = np.mean(hsv_image[:, :, 0])
     print(average_h)
 
