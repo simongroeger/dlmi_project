@@ -64,7 +64,7 @@ def save_video_dict():
                 current_dict[label] += count
         video_dict[video] = current_dict
 
-    pd.DataFrame.from_dict(video_dict).to_csv("../images/video_dict.csv")
+    pd.DataFrame.from_dict(video_dict).to_csv("../../csvs/video_dict.csv")
     return video_dict
 
 class_dict = {
