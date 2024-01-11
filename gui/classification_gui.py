@@ -7,7 +7,7 @@ import cv2
 import matplotlib
 import numpy as np
 import torch
-from timm.models import create_model
+# from timm.models import create_model
 
 
 
@@ -21,7 +21,7 @@ class ClassificationGUI(QMainWindow):
 
         self.images_path = images_path
         self.metadata_path = metadata_path
-        self.model = self.load_model
+        # self.model = self.load_model
         self.baseline_threshold = 0.60139
         self.selected_image_path = QLabel("", self)
         self.selected_image_path.setVisible(False)

@@ -11,8 +11,6 @@ def create_gui():
     """Create classification GUI"""
 
     gui_path = "gui/classification_gui.ui"
-    # images_path = "Sourcecode/pytorch-image-models/images/all"
-    # metadata_path = "Sourcecode/gui.py/metadata.csv"
     images_path = "pytorch-image-models/images/all"
     metadata_path = "pytorch-image-models/images/metadata.csv"
     application = QApplication(sys.argv)
