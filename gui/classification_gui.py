@@ -36,34 +36,36 @@ class ClassificationGUI(QMainWindow):
         # select file from explorer
         selected_image_path, _ = QFileDialog.getOpenFileName(self, 'Open file', self.images_path, "Image file (*.jpg)")
 
-        # update sample_image_field
-        label_size = self.sample_image_field.size()
-        self.image = QPixmap(selected_image_path).scaled(label_size, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-        self.sample_image_field.setPixmap(self.image)
+        if selected_image_path != "":
+            # update sample_image_field
+            label_size = self.sample_image_field.size()
+            self.image = QPixmap(selected_image_path).scaled(label_size, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+            self.sample_image_field.setPixmap(self.image)
 
-        # update additional information
-        # TODO: add csv mapping (data set type)
-        in_dataset = ["train set", "test set", "validation set", "None"]
-        in_dataset_idx = 3
-        image_class, fname = selected_image_path.split("/")[-2:]
-        image_class = image_class.replace("_","").lower()
-        df = pd.read_csv(self.metadata_path, sep=";")
-        df["finding_class2"] = df["finding_class"].str.replace(" ", "")
-        df["finding_class2"] = df["finding_class2"].str.lower()
-        d = df[df["filename"].str.match(fname) & df["finding_class2"].str.match(image_class)]
-        if not d.empty:
-            data = "filename: {0}\nvideo ID: {1}\nframe number: {2}\nfinding category: {3}\nfinding class: {4}\ndata set: {5}\nx1: {6}\ny1: {7}\nx2: {8}\ny2: {9}\nx3: {10}\ny3: {11}\nx4: {12}\ny4: {13}"\
-                .format(d.iloc[0,0], d.iloc[0,1], d.iloc[0,2], d.iloc[0,3], d.iloc[0,4], in_dataset[in_dataset_idx], d.iloc[0,5], d.iloc[0,6], d.iloc[0,7], d.iloc[0,8], d.iloc[0,9], d.iloc[0,10], d.iloc[0,11], d.iloc[0,12])
-            self.additional_sample_information_field.setPlainText(data)
-        else:
-            self.additional_sample_information_field.setPlainText("No additional data found")
+            # update additional information
+            # TODO: add csv mapping (data set type)
+            in_dataset = ["train set", "test set", "validation set", "None"]
+            in_dataset_idx = 3
+            image_class, fname = selected_image_path.split("/")[-2:]
+            image_class = image_class.replace("_","").lower()
+            df = pd.read_csv(self.metadata_path, sep=";")
+            df["finding_class2"] = df["finding_class"].str.replace(" ", "")
+            df["finding_class2"] = df["finding_class2"].str.replace("-", "")
+            df["finding_class2"] = df["finding_class2"].str.lower()
+            d = df[df["filename"].str.match(fname) & df["finding_class2"].str.match(image_class)]
+            if not d.empty:
+                data = "filename: {0}\nvideo ID: {1}\nframe number: {2}\nfinding category: {3}\nfinding class: {4}\ndata set: {5}\nx1: {6}\ny1: {7}\nx2: {8}\ny2: {9}\nx3: {10}\ny3: {11}\nx4: {12}\ny4: {13}"\
+                    .format(d.iloc[0,0], d.iloc[0,1], d.iloc[0,2], d.iloc[0,3], d.iloc[0,4], in_dataset[in_dataset_idx], d.iloc[0,5], d.iloc[0,6], d.iloc[0,7], d.iloc[0,8], d.iloc[0,9], d.iloc[0,10], d.iloc[0,11], d.iloc[0,12])
+                self.additional_sample_information_field.setPlainText(data)
+            else:
+                self.additional_sample_information_field.setPlainText("No additional data found")
 
-        # del prediction
-        self.baseline_prediction_field.clear()
-        self.nn_prediction_field.clear()
+            # del prediction
+            self.baseline_prediction_field.clear()
+            self.nn_prediction_field.clear()
 
-        # store image path
-        self.selected_image_path.setText(selected_image_path)
+            # store image path
+            self.selected_image_path.setText(selected_image_path)
 
     def baseline_classification(self):
         """Predict image class with baseline model, based on h values"""
