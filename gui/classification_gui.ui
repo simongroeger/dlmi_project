@@ -33,29 +33,11 @@
      <string>Bleeding detection for Wireless Capsule Endoscopy</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="select_sample_Button">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>160</y>
-      <width>121</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Select sample</string>
-    </property>
-   </widget>
    <widget class="QTextBrowser" name="nn_prediction_field">
     <property name="geometry">
      <rect>
       <x>200</x>
-      <y>330</y>
+      <y>350</y>
       <width>171</width>
       <height>51</height>
      </rect>
@@ -71,7 +53,7 @@
      <rect>
       <x>1090</x>
       <y>450</y>
-      <width>221</width>
+      <width>211</width>
       <height>321</height>
      </rect>
     </property>
@@ -99,47 +81,11 @@
      <string>Additional sample information</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="baseline_classification_Button">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>270</y>
-      <width>171</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Baseline Classification</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="nn_classification_Button">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>270</y>
-      <width>171</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>NN Classification</string>
-    </property>
-   </widget>
    <widget class="QTextBrowser" name="baseline_prediction_field">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>330</y>
+      <y>350</y>
       <width>171</width>
       <height>51</height>
      </rect>
@@ -174,6 +120,60 @@
       <width>661</width>
       <height>621</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="select_sample_Button_2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>270</y>
+      <width>171</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Baseline Classification</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="select_sample_Button_3">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>270</y>
+      <width>171</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>NN Classification</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="select_sample_Button_4">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>150</y>
+      <width>171</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Select sample</string>
     </property>
    </widget>
   </widget>
