@@ -42,23 +42,8 @@ class ClassificationGUI(QMainWindow):
             self.image = QPixmap(selected_image_path).scaled(label_size, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
             self.sample_image_field.setPixmap(self.image)
 
-            # update additional information
-            # TODO: add csv mapping (data set type)
-            in_dataset = ["train set", "test set", "validation set", "None"]
-            in_dataset_idx = 3
-            image_class, fname = selected_image_path.split("/")[-2:]
-            image_class = image_class.replace("_","").lower()
-            df = pd.read_csv(self.metadata_path, sep=";")
-            df["finding_class2"] = df["finding_class"].str.replace(" ", "")
-            df["finding_class2"] = df["finding_class2"].str.replace("-", "")
-            df["finding_class2"] = df["finding_class2"].str.lower()
-            d = df[df["filename"].str.match(fname) & df["finding_class2"].str.match(image_class)]
-            if not d.empty:
-                data = "filename: {0}\nvideo ID: {1}\nframe number: {2}\nfinding category: {3}\nfinding class: {4}\ndata set: {5}\nx1: {6}\ny1: {7}\nx2: {8}\ny2: {9}\nx3: {10}\ny3: {11}\nx4: {12}\ny4: {13}"\
-                    .format(d.iloc[0,0], d.iloc[0,1], d.iloc[0,2], d.iloc[0,3], d.iloc[0,4], in_dataset[in_dataset_idx], d.iloc[0,5], d.iloc[0,6], d.iloc[0,7], d.iloc[0,8], d.iloc[0,9], d.iloc[0,10], d.iloc[0,11], d.iloc[0,12])
-                self.additional_sample_information_field.setPlainText(data)
-            else:
-                self.additional_sample_information_field.setPlainText("No additional data found")
+            # update additional image data
+            self.update_add_data(selected_image_path)
 
             # del prediction
             self.baseline_prediction_field.clear()
@@ -66,6 +51,37 @@ class ClassificationGUI(QMainWindow):
 
             # store image path
             self.selected_image_path.setText(selected_image_path)
+
+    def update_add_data(self, selected_image_path):
+        """Update additional image data widget"""
+
+        # get metadata for selected image path
+        image_class, fname = selected_image_path.split("/")[-2:]
+        image_class = image_class.replace("_","").lower()
+        df = pd.read_csv(self.metadata_path, sep=";")
+        df["finding_class2"] = df["finding_class"].str.replace(" ", "")
+        df["finding_class2"] = df["finding_class2"].str.replace("-", "")
+        df["finding_class2"] = df["finding_class2"].str.lower()
+        d = df[df["filename"].str.match(fname) & df["finding_class2"].str.match(image_class)]
+        
+        # get data set type for selected image path
+            # load dfs with train, val, test separation
+        train_split = pd.read_csv("csvs/splits_by_video/train_split.csv", sep=';')
+        test_split = pd.read_csv("csvs/splits_by_video/test_split.csv", sep=';')
+        val_split = pd.read_csv("csvs/splits_by_video/val_split.csv", sep=';')
+            # convert current data to identifier
+        split_imge_classes = {'normalcleanmucosa': 'Normal', 'ileocecalvalve': 'Ileo-cecal valve', 'pylorus': 'Pylorus', 'erosion': 'Erosion', 'reducedmucosalview': 'Reduced Mucosal View', 'angiectasia': 'Angiectasia', 'ampullaofvater': 'Ampulla,', 'erythema': 'Erythematous', 'bloodfresh': 'Blood', 'bloodhematin': 'Blood', 'foreignbody': 'Foreign Bodies', 'ulcer': 'Ulcer', 'polyp': 'Polyp', 'lymphangiectasia': 'Lymphangiectasia'}
+        image_idf = fname + ',' + split_imge_classes[image_class]
+            # get dataset
+        in_dataset = "train set" if image_idf in set(train_split['filename,label']) else "test set" if image_idf in set(test_split['filename,label']) else "val set" if image_idf in set(val_split['filename,label']) else "None"
+        
+        # update add data field
+        if not d.empty:
+            data = "filename: {0}\nvideo ID: {1}\nframe number: {2}\nfinding category: {3}\nfinding class: {4}\ndata set: {5}\nx1: {6}\ny1: {7}\nx2: {8}\ny2: {9}\nx3: {10}\ny3: {11}\nx4: {12}\ny4: {13}"\
+                .format(d.iloc[0,0], d.iloc[0,1], d.iloc[0,2], d.iloc[0,3], d.iloc[0,4], in_dataset, d.iloc[0,5], d.iloc[0,6], d.iloc[0,7], d.iloc[0,8], d.iloc[0,9], d.iloc[0,10], d.iloc[0,11], d.iloc[0,12])
+            self.additional_sample_information_field.setPlainText(data)
+        else:
+            self.additional_sample_information_field.setPlainText("No additional data found")
 
     def baseline_classification(self):
         """Predict image class with baseline model, based on h values"""
