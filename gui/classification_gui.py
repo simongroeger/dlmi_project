@@ -94,10 +94,6 @@ class ClassificationGUI(QMainWindow):
             msg.exec()
             return
 
-        # load model
-        if self.model == None:
-            self.model = self.load_model()
-
         # load image
         image = cv2.imread(self.selected_image_path.text())
         resized_image = cv2.resize(image, dsize=(288, 288), interpolation=cv2.INTER_LINEAR)

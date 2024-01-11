@@ -191,15 +191,16 @@ def copy_images_all(source, dest, thresh=1000000):
 
 
 # data does not have predefined splits, create them
-def create_splits(src_dataset, src_trainset, train_split, thresh, ratio_train):
+def create_splits(src_dataset, src_trainset, thresh, src_csv):
     
     print('Splitting images into train and val')
 
     cls_folder_list = os.listdir(os.path.join(src_dataset))
     target_class_list = ['blood', 'other']
+    splits = ['train_split', 'val_split', 'test_split']
 
     # create new dirs at destination if necessary
-    for split in ['split_0', 'split_1']:
+    for split in splits:
         try:
             os.mkdir( os.path.join(src_trainset, split) )
             print('created directory')
@@ -213,23 +214,23 @@ def create_splits(src_dataset, src_trainset, train_split, thresh, ratio_train):
             except:
                 pass
 
-    class_count = np.zeros((2, len(cls_folder_list)))
+    class_count = np.zeros((len(splits), len(cls_folder_list)))
 
     img_list = []
     for cls_folder in cls_folder_list: 
         img_list.append(os.listdir(os.path.join(src_dataset, cls_folder)))
 
     # split according to csv
-    for split_i, split in enumerate(['split_0', 'split_1']):
+    for split_i, split in enumerate(splits):
         print(split)
         # read split.csv data
-        with open(src_trainset + "/" + split + ".csv", newline='') as csvfile:
+        with open(src_csv + "/" + split + ".csv", newline='') as csvfile:
             r = csv.reader(csvfile, delimiter=',')
             first = True
             for row in r:
-                if first: 
+                if first:
                     first = False
-                    continue    
+                    continue
                 img_name = row[0]
                 found = False
                 for cls_i, cls_folder in enumerate(cls_folder_list): 
@@ -257,35 +258,8 @@ def create_splits(src_dataset, src_trainset, train_split, thresh, ratio_train):
                 if not found:
                     print("Warning: file from csv not found", img_name)
 
-    # distribute remaining files
-    print("distrbute reaiming images equally")
-    for cls_i, cls_folder in enumerate(cls_folder_list): 
-        for split_i, split in enumerate(['split_0', 'split_1']):
-            img_list = os.listdir(os.path.join(src_dataset, cls_folder))
 
-            # move files with step given by ratio_train into val folder (i.e. every 5th image is val)
-            for i in range(0, len(img_list), int(1/(1-ratio_train)) if split == 'split_0' else 1 ):
-
-                img_name = img_list[i]
-
-                img_path_src = os.path.join(src_dataset, cls_folder, img_name)
-
-                if not os.path.isfile(img_path_src):
-                    print('val: Warning, not a file or does not exist: ' + img_path_src )
-                    continue
-
-                if class_count[split_i, cls_i] > thresh and split == train_split:
-                            continue
-                else:
-                    class_count[split_i, cls_i] += 1
-
-                target_class = 'blood' if 'blood' in cls_folder else 'other'
-                dest_filepath = os.path.join(src_trainset, split, target_class, img_name)
-                shutil.move(img_path_src, dest_filepath)
-
-
-
-    print('Finished splitting images into train and val')
+    print('Finished splitting images into train, val and test')
 
 
 
@@ -293,20 +267,20 @@ if __name__ == '__main__' :
 
     # user input
     parser = argparse.ArgumentParser()
-    parser.add_argument('--thresh', type=int, default=1000, help='maximum number of images per class')
-    parser.add_argument('--images-src', type=str, default='./images',
+    parser.add_argument('--thresh', type=int, default=100000, help='maximum number of images per class')
+    parser.add_argument('--images-src', type=str, default='pytorch-image-models/images',
         help='path to directory where images are in all')
     parser.add_argument('--datadir', type=str, default="all")
 
     args = parser.parse_args()
     print(args)
 
-    train_split = "split_0"
+    train_split = "train_split"
 
     # balance dataset
     copy_images_all(args.images_src + "/" + args.datadir, args.images_src+"/tmp")
 
-    create_splits(args.images_src+"/tmp", args.images_src, train_split, args.thresh, 0.5)
+    create_splits(args.images_src+"/tmp", args.images_src, args.thresh, "csvs/splits_by_video")
 
     fillup_splitted(args.images_src+"/"+train_split)
 
