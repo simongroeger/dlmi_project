@@ -1,330 +1,139 @@
-import tkinter as tk
-from tkinter import *
-from tkinter import messagebox, filedialog
-from PIL import ImageTk, Image
-import os
+from PyQt6.QtWidgets import *
+from PyQt6 import uic
+from PyQt6.QtGui import QPixmap
+from PyQt6.QtCore import Qt
 import pandas as pd
-from nn_classification import *
-from baseline_classification import *
+import cv2
+import matplotlib
+import numpy as np
+import torch
+from timm.models import create_model
 
 
-def load_data(path_1, path_2):
-    """Load testdata"""
 
-    filename_path_dict = {}
-    for root, _, files in os.walk(path_1):
-        for fname in files[:10]:
-            fpath = root+"/"+fname
-            filename_path_dict["Ampulla of Vater,"+fname] = [fpath, fname, "Ampulla of Vater"]
+class ClassificationGUI(QMainWindow):
 
-    for root, _, files in os.walk(path_2):
-        for fname in files[:10]:
-            fpath = root+"/"+fname
-            filename_path_dict["Blood - fresh,"+fname] = [fpath, fname, "Blood - fresh"]
+    def __init__(self, gui_path, images_path, metadata_path):
 
-    print(filename_path_dict)
-    return filename_path_dict
+        super(ClassificationGUI, self).__init__()
+        uic.loadUi(gui_path, self)
+        self.show()
 
+        self.images_path = images_path
+        self.metadata_path = metadata_path
+        self.model = self.load_model
+        self.baseline_threshold = 0.60139
+        self.selected_image_path = QLabel("", self)
+        self.selected_image_path.setVisible(False)
 
-def create_window():
-    """Create root window"""
+        self.select_sample_Button.clicked.connect(self.select_sample)
+        self.baseline_classification_Button.clicked.connect(self.baseline_classification)
+        self.nn_classification_Button.clicked.connect(self.nn_classification)
 
-    # create root window
-    root = Tk()  
-    root.title("Frame Example")
-    root.config(bg="skyblue")
-    root.geometry("1400x900")
+    def select_sample(self):
+        """Select image sample from explorer"""
 
-    # caption_frame = Frame(root, width=700, height=40)
-    # caption_frame.place(x=350, y=20)
-    # create_caption(root)    
+        # select file from explorer
+        selected_image_path, _ = QFileDialog.getOpenFileName(self, 'Open file', self.images_path, "Image file (*.jpg)")
 
-    # samples_header_frame = Frame(root, width=250, height=40)
-    # samples_header_frame.place(x=50, y=140)
+        # update sample_image_field
+        label_size = self.sample_image_field.size()
+        self.image = QPixmap(selected_image_path).scaled(label_size, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        self.sample_image_field.setPixmap(self.image)
 
-    # samples_frame = Frame(root, width=250, height=380)
-    # samples_frame.place(x=50, y=185)
-    # select_sample(root)
+        # update additional information
+        # TODO: add csv mapping (data set type)
+        in_dataset = ["train set", "test set", "validation set", "None"]
+        in_dataset_idx = 3
+        image_class, fname = selected_image_path.split("/")[-2:]
+        image_class = image_class.replace("_","").lower()
+        df = pd.read_csv(self.metadata_path, sep=";")
+        df["finding_class2"] = df["finding_class"].str.replace(" ", "")
+        df["finding_class2"] = df["finding_class2"].str.lower()
+        d = df[df["filename"].str.match(fname) & df["finding_class2"].str.match(image_class)]
+        if not d.empty:
+            data = "filename: {0}\nvideo ID: {1}\nframe number: {2}\nfinding category: {3}\nfinding class: {4}\ndata set: {5}\nx1: {6}\ny1: {7}\nx2: {8}\ny2: {9}\nx3: {10}\ny3: {11}\nx4: {12}\ny4: {13}"\
+                .format(d.iloc[0,0], d.iloc[0,1], d.iloc[0,2], d.iloc[0,3], d.iloc[0,4], in_dataset[in_dataset_idx], d.iloc[0,5], d.iloc[0,6], d.iloc[0,7], d.iloc[0,8], d.iloc[0,9], d.iloc[0,10], d.iloc[0,11], d.iloc[0,12])
+            self.additional_sample_information_field.setPlainText(data)
+        else:
+            self.additional_sample_information_field.setPlainText("No additional data found")
 
-    # class_header_frame = Frame(root, width=250, height=40)
-    # class_header_frame.place(x=50, y=610)
+        # del prediction
+        self.baseline_prediction_field.clear()
+        self.nn_prediction_field.clear()
 
-    # class_frame = Frame(root, width=250, height=100)
-    # class_frame.place(x=50, y=655)
-    # select_algorithm(root)
+        # store image path
+        self.selected_image_path.setText(selected_image_path)
 
-    # button_frame = Frame(root, width=250, height=50)
-    # button_frame.place(x=50, y=790)
-
-    # image_frame = Frame(root, width=700, height=700)
-    # image_frame.place(x=350, y=140)
-    # display_image(root)
-
-    # predition_header_frame = Frame(root, width=250, height=40)
-    # predition_header_frame.place(x=1090, y=140)
-
-    # predition_frame = Frame(root, width=250, height=40)
-    # predition_frame.place(x=1090, y=185)
-
-    # add_data_header_frame = Frame(root, width=250, height=40)
-    # add_data_header_frame.place(x=1100, y=270)
-
-    # add_data_frame = Frame(root, width=250, height=520)
-    # add_data_frame.place(x=1100, y=315)
-    # display_img_data(root)
-
-    return root
-    # root.mainloop()
-
-
-def create_caption(root):
-    """Create the caption of the window"""
-
-    # create cation frame
-    caption_frame = Frame(root, width=700, height=40)
-    caption_frame.place(x=350, y=20)
-
-    # set caption
-    tk.Label(caption_frame, font=("Arial", 25), 
-                text="Bleeding detection for Wireless Capsule Endoscopy").pack()
-    
-
-def select_sample(root, image_data, metadata_path, image_data_field, prediction_field):
-    """Select a sample for classification
-    https://www.geeksforgeeks.org/scrollable-listbox-in-python-tkinter/ ???"""
-
-    # create samples header frame
-    samples_header_frame = Frame(root, width=250, height=40)
-    samples_header_frame.place(x=50, y=140)
-
-    # set header
-    tk.Label(samples_header_frame, font=("Arial", 12), text="Image samples").pack()
-
-
-    # create samples frame
-    samples_frame = Frame(root, width=250, height=380)
-    samples_frame.place(x=50, y=185)
-
-    # create listbox, add it left-justified to samples frame
-    listbox = Listbox(samples_frame, height=20, width=30, font=("Arial", 11))
-    listbox.pack(side=LEFT, fill=BOTH) 
-    
-    # create scrollbar, add it right-justified to samples frame
-    scrollbar = Scrollbar(samples_frame)
-    scrollbar.pack(side=RIGHT, fill=BOTH) 
-    
-    # insert elements in listbox
-    image_names = list(image_data.keys())
-    for img_name in image_names: 
-        listbox.insert(END, img_name) 
+    def baseline_classification(self):
+        """Predict image class with baseline model, based on h values"""
         
-    # add vertical scrollbar to listbox
-    listbox.config(yscrollcommand=scrollbar.set) 
-    
-    # set vertical/yview of listbox
-    scrollbar.config(command=listbox.yview) 
+        if self.selected_image_path.text() == "":
+            msg = QMessageBox() 
+            msg.setIcon(QMessageBox.Icon.Critical)
+            msg.setText("An image must be selected.")
+            msg.exec()
+            return
+        
+        image = cv2.imread(self.selected_image_path.text())  
+        hsv_image = matplotlib.colors.rgb_to_hsv(image / 255.0)
+        average_h = np.mean(hsv_image[:, :, 0])
+        print(average_h)
 
-    # selection - click event
-    def show(event):
-        prediction_field.delete("1.0","end")
-        selection = listbox.curselection()
-        if selection:
-            selected_image_name = listbox.get(selection[0])
-            fpath, fname, image_class = image_data[selected_image_name]
-            display_image_data(root, fname, image_class, metadata_path, image_data_field)
-            display_image(root, fpath)
-            
-    listbox.bind("<<ListboxSelect>>", show)
+        pred_class = 1 if average_h < self.baseline_threshold else 0
+        image_classes = ["non Bleeding", "Bleeding"]
+        self.baseline_prediction_field.setPlainText(image_classes[pred_class])
 
-    # init: select first item of listbox 
-    listbox.select_set(0)
-    show("")
+    def nn_classification(self):
+        """Predict image class with neural network model"""
+        
+        if self.selected_image_path.text() == "":
+            msg = QMessageBox() 
+            msg.setIcon(QMessageBox.Icon.Critical)
+            msg.setText("An image must be selected.")
+            msg.exec()
+            return
 
-    return listbox
+        # load model
+        if self.model == None:
+            self.model = self.load_model()
 
+        # load image
+        image = cv2.imread(self.selected_image_path.text())
+        resized_image = cv2.resize(image, dsize=(288, 288), interpolation=cv2.INTER_LINEAR)
+        resized_image = resized_image
 
-def select_sample_from_file_explorer(root, data_path, metadata_path, image_data_field):
-    """Select sample from file explorer"""
-
-    # create frames
-    samples_header_frame = Frame(root, width=250, height=40)
-    samples_header_frame.place(x=50, y=140)
-
-    samples_button_frame = Frame(root, width=250, height=40)
-    samples_button_frame.place(x=50, y=190)
-
-    samples_text_frame = Frame(root, width=250, height=40)
-    samples_text_frame.place(x=50, y=240)
-
-    def select_sample():
-        fpath = filedialog.askopenfilename(initialdir=data_path, title="Select Sample")
-        fname = fpath.split("/")[-1]
-        image_class = fpath.split("/")[-2].replace("_", " ")
-        print("!!!"+image_class)
-
-        # update sample field
-        sample_field.delete("1.0","end")
-        sample_field.insert(END, fpath)
-
-        # update image data
-        display_image_data(root, fname, image_class, metadata_path, image_data_field)
-
-        # update image
-        display_image(root, fpath)
-
-    # set header
-    tk.Label(samples_header_frame, font=("Arial", 12), text="Image sample").pack()
-
-    # create file explorer button
-    button = Button(samples_button_frame, text="Select Sample", font=("Arial", 11), width=27, command=select_sample)
-    button.pack()
-
-    # create sample text field
-    sample_field = Text(samples_text_frame)
-    sample_field.configure(font=("Arial", 11), height=3, width=33)
-    sample_field.pack()
-
-    return sample_field
-
-
-def display_image(root, fpath):
-    """Display the selected WCE image"""
-
-    # create image frame
-    image_frame = Frame(root, width=700, height=700)
-    image_frame.place(x=400, y=190)
-
-    # create Tkinter PhotoImage object
-    image_path = fpath
-    img = ImageTk.PhotoImage(Image.open(image_path).resize((600,600)))
-
-    # show image with label widget
-    label = Label(image_frame, image=img)
-    label.image = img
-    label.pack()
-
-
-def create_image_data_field(root):
-    """Create image data field"""
-
-    # create additional img data header frame
-    add_data_header_frame = Frame(root, width=250, height=40)
-    add_data_header_frame.place(x=1090, y=270)
-
-    # set additional img data header
-    tk.Label(add_data_header_frame, font=("Arial", 12), text="Additional image data").pack()
-
-    # create additional img data frame
-    add_data_frame = Frame(root, width=250, height=520)
-    add_data_frame.place(x=1090, y=315)
-
-    # create image data field
-    image_data_field = Text(add_data_frame)
-    image_data_field.configure(font=("Arial", 11), height=28, width=33)
-    image_data_field.pack()
-
-    return image_data_field
-
-
-def display_image_data(root, fname, image_class, metadata_path, image_data_field):
-    """Display additional data to selected image"""
-
-    # set additional img data text
-    df = pd.read_csv(metadata_path, sep=";")
-    # TODO mapping finding_class to csv
-    d = df[df["filename"].str.match(fname) & df["finding_class"].str.match(image_class, False)]
-    image_data_field.delete("1.0","end")
-
-    if not d.empty:
-        data = "Filename: {0}\nVideo_id: {1}\nFrame_number: {2}\nFinding_category: {3}\nFinding_class: {4}\nX1: {5}\nY1: {6}\nX2: {7}\nY2: {8}\nX3: {9}\nY3: {10}\nX4: {11}\nY4: {12}"\
-            .format(d.iloc[0,0], d.iloc[0,1], d.iloc[0,2], d.iloc[0,3], d.iloc[0,4], d.iloc[0,5], d.iloc[0,6], d.iloc[0,7], d.iloc[0,8], d.iloc[0,9], d.iloc[0,10], d.iloc[0,11], d.iloc[0,12])
-        image_data_field.insert(END, data)
-    image_data_field.insert(END, "No additional data found")
-
-
-def select_algorithm(root):
-    """Select algorithm which should be used for the WCE image classification"""
-
-    # create class header frame
-    class_header_frame = Frame(root, width=250, height=40)
-    class_header_frame.place(x=50, y=610)
-
-    # set header
-    tk.Label(class_header_frame, font=("Arial", 12), text="Classifier").pack()
-
-    # create class frame
-    class_frame = Frame(root, width=250, height=100)
-    class_frame.place(x=50, y=655)
-
-    # create algorithm radio button
-    neural_network_selected = IntVar()   
-    baseline_selected = IntVar() 
-    checkbutton_1 = Checkbutton(class_frame, text="Neural Network", font=("Arial", 11), width=25, variable=neural_network_selected, onvalue = 1, offvalue = 0)# , height = 2, width = 10) 
-    checkbutton_1.pack()
-    checkbutton_2 = Checkbutton(class_frame, text="Baseline", font=("Arial", 11), width=25, variable=baseline_selected, onvalue = 1, offvalue = 0)# , height = 2, width = 10) 
-    checkbutton_2.pack()
-    return neural_network_selected, baseline_selected
-
-
-def create_prediction_field(root):
-    """Create Prediciton header and field"""
-
-    # create predition header frame
-    predition_header_frame = Frame(root, width=250, height=40)
-    predition_header_frame.place(x=1090, y=140)
-    
-    # set header
-    tk.Label(predition_header_frame, font=("Arial", 12), text="Image class prediction").pack()
-
-    # create predition frame
-    predition_frame = Frame(root, width=250, height=40)
-    predition_frame.place(x=1090, y=185)
-
-    # create prediciton field
-    prediction_field = Text(predition_frame)
-    prediction_field.configure(font=("Arial", 11), height=3, width=33)
-    prediction_field.pack()
-
-    return prediction_field
-
-
-def classify_image(root, sample_field, neural_network_selected, baseline_selected, prediction_field):
-    """Classifies the selected image with the selected algorithm and shows class"""
-
-    def prediction():
-
-        # get filepath from sample field
-        fpath = sample_field.get("1.0",END)[:-1]
+        # create torch tensor
+        imagenet_mean = np.array([0.485, 0.456, 0.406])
+        imagenet_stddev = np.array([0.229, 0.224, 0.225])
+        normalized_image = (image/255.0 - imagenet_mean) / imagenet_stddev
+        
+        torch_image = torch.from_numpy(normalized_image).float()
+        torch_image = torch_image.unsqueeze(0)
+        torch_image = torch_image.permute((0, 3, 1, 2))
 
         # predict image class
-        image_class_1 = ""
-        image_class_2 = ""
-        if neural_network_selected.get() == 1:
-            image_class_1 = "Neural Network prediction: "+nn_classify(fpath)
-        if baseline_selected.get() == 1:
-            image_class_2 = "Baseline prediciton: "+baseline_classify(fpath)
-        if neural_network_selected.get() == 0 and baseline_selected.get() == 0:
-             messagebox.showerror('Python Error', 'Error: Select a classifier.')
+        output = self.model(torch_image).softmax(-1)
+        output, indices = output.topk(1)
 
-        # update predicion field
-        prediction_field.delete("1.0","end")
-        if image_class_1 != "" and image_class_2 != "":
-            image_classes = image_class_1+"\n"+image_class_2
-        elif image_class_1 != "" and image_class_2 == "":
-            image_classes = image_class_1
-        elif image_class_1 == "" and image_class_2 != "":
-            image_classes = image_class_2
-        prediction_field.insert(END, image_classes)
-    
-    # create button frame
-    button_frame = Frame(root, width=250, height=50)
-    button_frame.place(x=50, y=765)
+        pred_class = 1 - indices.item()
+        image_classes = ["non Bleeding", "Bleeding"]
+        self.nn_prediction_field.setPlainText(image_classes[pred_class])
 
-    # create prediction button
-    button = Button(button_frame, text="Classify", font=("Arial", 11), width=27, command=prediction)
-    button.pack()
+    def load_model(self):
+        """Load model"""
 
+        model_name = "resnet34d"
+        model_path = "models/classifier_resnet34d_20231220-173028_9.pth.tar"
 
+        print("loading model", model_path)
+        model = create_model(
+            model_name,
+            num_classes=2,
+            in_chans=3,
+            pretrained=True,
+            checkpoint_path=model_path,
+        )
+        model.eval()
 
-
-
+        return model
