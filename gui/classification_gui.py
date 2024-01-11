@@ -38,6 +38,7 @@ class ClassificationGUI(QMainWindow):
 
         if selected_image_path != "":
             # update sample_image_field
+            self.textBrowser.deleteLater()
             label_size = self.sample_image_field.size()
             self.image = QPixmap(selected_image_path).scaled(label_size, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
             self.sample_image_field.setPixmap(self.image)
