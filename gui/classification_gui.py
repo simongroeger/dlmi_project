@@ -22,7 +22,6 @@ class ClassificationGUI(QMainWindow):
         self.images_path = images_path
         self.metadata_path = metadata_path
         self.model = self.load_model()
-        self.baseline_threshold = 0.60139
         self.selected_image_path = QLabel("", self)
         self.selected_image_path.setVisible(False)
 
@@ -97,9 +96,8 @@ class ClassificationGUI(QMainWindow):
         image = cv2.imread(self.selected_image_path.text())  
         hsv_image = matplotlib.colors.rgb_to_hsv(image / 255.0)
         average_h = np.mean(hsv_image[:, :, 0])
-        print(average_h)
 
-        pred_class = 1 if average_h < self.baseline_threshold else 0
+        pred_class = 1 if average_h > 0.6015 and average_h < 0.6057 or average_h > 0.6088 else 0
         image_classes = ["non Bleeding", "Bleeding"]
         self.baseline_prediction_field.setPlainText(image_classes[pred_class])
 
@@ -138,8 +136,8 @@ class ClassificationGUI(QMainWindow):
     def load_model(self):
         """Load model"""
 
-        model_name = "resnet34d"
-        model_path = "models/classifier_resnet34d_20231220-173028_9.pth.tar"
+        model_name = "resnet18d"
+        model_path = "models/classifier_resnet18d_20240111-154528_8.pth.tar"
 
         print("loading model", model_path)
         model = create_model(
