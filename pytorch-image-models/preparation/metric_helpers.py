@@ -13,8 +13,6 @@ from pytorch_msssim import ms_ssim, ssim
 """
 Returns structural similarity score between two images
 """
-
-
 def calculate_pairwise_sim(img1, img2):
     return ssim(img1, img2, data_range=255, size_average=False)
 
@@ -46,12 +44,17 @@ def ssim_for_all_images():
                 ssim_values[j][i] = sim
         pd.DataFrame(ssim_values, columns=img_paths).to_csv("../images/sim_blood2")
 
-
+def filter_out_hematin(df, c) :
+    # Filter hematin out (should only be in first cluster, since too few examples)
+    hematin_labels = list(df.filter(regex='blood_hematin'))
+    hematin_indices = [df.columns.get_loc(col) for col in hematin_labels]
+    df[hematin_labels] = 0
+    df.iloc[hematin_indices] = 0
+    c[0] += hematin_labels
+    return df, c
 """
 Create clusters based on saved similarity scores
 """
-
-
 def get_clusters(num_clusters, df, specific_num_cluster=None, threshold=0.0009):
     if num_clusters is not None:
         cluster_sizes = [len(df) // num_clusters] * num_clusters
@@ -62,8 +65,11 @@ def get_clusters(num_clusters, df, specific_num_cluster=None, threshold=0.0009):
     else:
         raise Exception("PLEASE DEFINE CLUSTER SIZE")
 
-    files = df.columns
     current_cluster = 0
+    files = df.columns
+    filter_out_hematin(df, c)
+
+    # Iterate over df items and split into splits
     for name, column in tqdm(df.items()):
         if df.sum().sum() == 0:
             break
@@ -120,5 +126,5 @@ def save_clusters(c, split_names):
 if __name__ == '__main__':
     # ssim_for_all_images()
     df = pd.read_csv("../../csvs/splits_by_metric/ssim_blood.csv", index_col=0)
-    clusters = get_clusters(None, df, [398, 30, 30], 0.0002)
+    clusters = get_clusters(None, df, [388, 35, 35], 0.0002)
     save_clusters(clusters, ["train_split.csv", "val_split.csv", "test_split.csv"])
