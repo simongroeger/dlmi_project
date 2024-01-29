@@ -180,7 +180,7 @@ group.add_argument('--opt-kwargs', nargs='*', default={}, action=utils.ParseKwar
 
 # Learning rate schedule parameters
 group = parser.add_argument_group('Learning rate schedule parameters')
-group.add_argument('--sched', type=str, default='cosine', metavar='SCHEDULER',
+group.add_argument('--sched', type=str, default='step', metavar='SCHEDULER',
                    help='LR scheduler (default: "step"')
 group.add_argument('--sched-on-updates', action='store_true', default=False,
                    help='Apply LR scheduler step on update instead of epoch end.')
@@ -287,7 +287,7 @@ group.add_argument('--drop', type=float, default=0.0, metavar='PCT',
                    help='Dropout rate (default: 0.)')
 group.add_argument('--drop-connect', type=float, default=None, metavar='PCT',
                    help='Drop connect rate, DEPRECATED, use drop-path (default: None)')
-group.add_argument('--drop-path', type=float, default=None, metavar='PCT',
+group.add_argument('--drop-path', type=float, default=0.05, metavar='PCT',
                    help='Drop path rate (default: None)')
 group.add_argument('--drop-block', type=float, default=None, metavar='PCT',
                    help='Drop block rate (default: None)')
@@ -324,7 +324,7 @@ group.add_argument('--log-interval', type=int, default=50, metavar='N',
                    help='how many batches to wait before logging training status')
 group.add_argument('--recovery-interval', type=int, default=0, metavar='N',
                    help='how many batches to wait before writing recovery checkpoint')
-group.add_argument('--checkpoint-hist', type=int, default=10, metavar='N',
+group.add_argument('--checkpoint-hist', type=int, default=3, metavar='N',
                    help='number of checkpoints to keep (default: 10)')
 group.add_argument('-j', '--workers', type=int, default=4, metavar='N',
                    help='how many training processes to use (default: 4)')
@@ -425,6 +425,10 @@ def main():
     assert args.rank >= 0
 
     print("device", device.type)
+
+    print("param: lr", args.lr)
+
+    print("aug param: hfli, vflip, color-jitter, aa, reprob", args.hflip, args.vflip, args.color_jitter, args.aa, args.reprob)
 
     # resolve AMP arguments based on PyTorch / Apex availability
     use_amp = None
@@ -649,7 +653,7 @@ def main():
         batch_size=args.batch_size,
     )
 
-    print("Loaded data:", len(dataset_train), len(dataset_eval))
+    print("Loaded",  len(dataset_train), "train and",  len(dataset_eval), "eval data:")
 
 
     # setup mixup / cutmix
@@ -1159,10 +1163,10 @@ def validate(
     
 
    
-    _logger.info(' * Acc@1 {:.3f}. Acc@5 {:.3f}. Precision {:.3f} Recall {:.3f} F1 {:.3f} '.format(
+    print(' * Acc@1 {:.3f}. Acc@5 {:.3f}. Precision {:.3f} Recall {:.3f} F1 {:.3f} '.format(
        metrics['top1'], metrics['top5'], metrics['precision'], metrics['recall'], metrics['f1score']))
 
-    print_confusion(args, confusion, precision, recall)
+    #print_confusion(args, confusion, precision, recall)
 
 
     return metrics

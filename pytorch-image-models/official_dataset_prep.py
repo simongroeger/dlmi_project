@@ -231,10 +231,10 @@ def create_splits(src_dataset, src_trainset, thresh, src_csv):
                 if first:
                     first = False
                     continue
-                img_name = row[0]
+                img_name = row[1]
                 found = False
                 for cls_i, cls_folder in enumerate(cls_folder_list): 
-                    if row[0] in img_list[cls_i]:
+                    if img_name in img_list[cls_i]:
                         #print(img_name, "is in", cls_folder)
                         if found: 
                             print("Warning: file duplicated", img_name)
@@ -280,7 +280,7 @@ if __name__ == '__main__' :
     # balance dataset
     copy_images_all(args.images_src + "/" + args.datadir, args.images_src+"/tmp")
 
-    create_splits(args.images_src+"/tmp", args.images_src, args.thresh, "csvs/splits_by_video")
+    create_splits(args.images_src+"/tmp", args.images_src, args.thresh, "csvs/splits_by_metric")
 
     fillup_splitted(args.images_src+"/"+train_split)
 

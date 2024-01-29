@@ -1,0 +1,144 @@
+---------------------------
+cuda available
+device cuda
+param: lr 0.05
+train class imbalance tensor([0.4998, 0.5002], device='cuda:0')
+Loaded 9162 train and 864 eval data:
+ * Acc@1 22.569. Acc@5 100.000. Precision 3.343 Recall 85.185 F1 6.434 
+ * Acc@1 96.991. Acc@5 100.000. Precision 66.667 Recall 7.407 F1 13.333 
+ * Acc@1 91.898. Acc@5 100.000. Precision 26.882 Recall 92.593 F1 41.667 
+ * Acc@1 96.759. Acc@5 100.000. Precision 48.980 Recall 88.889 F1 63.158 
+ * Acc@1 98.148. Acc@5 100.000. Precision 66.667 Recall 81.481 F1 73.333 
+ * Acc@1 97.685. Acc@5 100.000. Precision 62.963 Recall 62.963 F1 62.963 
+ * Acc@1 99.653. Acc@5 100.000. Precision 96.154 Recall 92.593 F1 94.340 
+ * Acc@1 98.032. Acc@5 100.000. Precision 72.727 Recall 59.259 F1 65.306 
+ * Acc@1 99.190. Acc@5 100.000. Precision 100.000 Recall 74.074 F1 85.106 
+ * Acc@1 98.958. Acc@5 100.000. Precision 95.000 Recall 70.370 F1 80.851 
+ * Acc@1 99.074. Acc@5 100.000. Precision 95.238 Recall 74.074 F1 83.333 
+ * Acc@1 97.917. Acc@5 100.000. Precision 100.000 Recall 33.333 F1 50.000 
+ * Acc@1 98.495. Acc@5 100.000. Precision 100.000 Recall 51.852 F1 68.293 
+ * Acc@1 97.338. Acc@5 100.000. Precision 83.333 Recall 18.519 F1 30.303 
+ * Acc@1 97.222. Acc@5 100.000. Precision 100.000 Recall 11.111 F1 20.000 
+ * Acc@1 97.454. Acc@5 100.000. Precision 72.727 Recall 29.630 F1 42.105 
+ * Acc@1 99.074. Acc@5 100.000. Precision 100.000 Recall 70.370 F1 82.609 
+ * Acc@1 98.380. Acc@5 100.000. Precision 84.211 Recall 59.259 F1 69.565 
+ * Acc@1 98.958. Acc@5 100.000. Precision 100.000 Recall 66.667 F1 80.000 
+ * Acc@1 98.495. Acc@5 100.000. Precision 85.000 Recall 62.963 F1 72.340 
+cuda available
+device cuda
+param: lr 0.02
+train class imbalance tensor([0.4998, 0.5002], device='cuda:0')
+Loaded 9162 train and 864 eval data:
+ * Acc@1 22.569. Acc@5 100.000. Precision 3.343 Recall 85.185 F1 6.434 
+ * Acc@1 96.644. Acc@5 100.000. Precision 0.000 Recall 0.000 F1 0.000 
+ * Acc@1 95.139. Acc@5 100.000. Precision 37.288 Recall 81.481 F1 51.163 
+ * Acc@1 96.412. Acc@5 100.000. Precision 44.737 Recall 62.963 F1 52.308 
+ * Acc@1 99.306. Acc@5 100.000. Precision 92.000 Recall 85.185 F1 88.462 
+ * Acc@1 99.421. Acc@5 100.000. Precision 95.833 Recall 85.185 F1 90.196 
+ * Acc@1 99.884. Acc@5 100.000. Precision 96.429 Recall 100.000 F1 98.182 
+ * Acc@1 98.032. Acc@5 100.000. Precision 100.000 Recall 37.037 F1 54.054 
+ * Acc@1 97.685. Acc@5 100.000. Precision 58.140 Recall 92.593 F1 71.429 
+ * Acc@1 98.380. Acc@5 100.000. Precision 93.333 Recall 51.852 F1 66.667 
+ * Acc@1 99.537. Acc@5 100.000. Precision 100.000 Recall 85.185 F1 92.000 
+ * Acc@1 98.032. Acc@5 100.000. Precision 100.000 Recall 37.037 F1 54.054 
+ * Acc@1 97.801. Acc@5 100.000. Precision 90.000 Recall 33.333 F1 48.649 
+ * Acc@1 97.569. Acc@5 100.000. Precision 100.000 Recall 22.222 F1 36.364 
+ * Acc@1 97.338. Acc@5 100.000. Precision 100.000 Recall 14.815 F1 25.806 
+ * Acc@1 97.917. Acc@5 100.000. Precision 100.000 Recall 33.333 F1 50.000 
+ * Acc@1 98.148. Acc@5 100.000. Precision 100.000 Recall 40.741 F1 57.895 
+ * Acc@1 98.727. Acc@5 100.000. Precision 94.444 Recall 62.963 F1 75.556 
+ * Acc@1 98.032. Acc@5 100.000. Precision 100.000 Recall 37.037 F1 54.054 
+ * Acc@1 99.421. Acc@5 100.000. Precision 95.833 Recall 85.185 F1 90.196 
+cuda available
+device cuda
+param: lr 0.005
+train class imbalance tensor([0.4998, 0.5002], device='cuda:0')
+Loaded 9162 train and 864 eval data:
+ * Acc@1 22.569. Acc@5 100.000. Precision 3.343 Recall 85.185 F1 6.434 
+ * Acc@1 92.014. Acc@5 100.000. Precision 2.273 Recall 3.704 F1 2.817 
+ * Acc@1 94.560. Acc@5 100.000. Precision 11.538 Recall 11.111 F1 11.321 
+ * Acc@1 96.296. Acc@5 100.000. Precision 22.222 Recall 7.407 F1 11.111 
+ * Acc@1 98.380. Acc@5 100.000. Precision 93.333 Recall 51.852 F1 66.667 
+ * Acc@1 97.801. Acc@5 100.000. Precision 90.000 Recall 33.333 F1 48.649 
+ * Acc@1 98.495. Acc@5 100.000. Precision 69.444 Recall 92.593 F1 79.365 
+ * Acc@1 98.032. Acc@5 100.000. Precision 75.000 Recall 55.556 F1 63.830 
+ * Acc@1 98.727. Acc@5 100.000. Precision 86.364 Recall 70.370 F1 77.551 
+ * Acc@1 98.380. Acc@5 100.000. Precision 93.333 Recall 51.852 F1 66.667 
+ * Acc@1 99.190. Acc@5 100.000. Precision 100.000 Recall 74.074 F1 85.106 
+ * Acc@1 98.032. Acc@5 100.000. Precision 100.000 Recall 37.037 F1 54.054 
+ * Acc@1 98.611. Acc@5 100.000. Precision 100.000 Recall 55.556 F1 71.429 
+ * Acc@1 98.843. Acc@5 100.000. Precision 100.000 Recall 62.963 F1 77.273 
+ * Acc@1 98.495. Acc@5 100.000. Precision 100.000 Recall 51.852 F1 68.293 
+ * Acc@1 98.380. Acc@5 100.000. Precision 100.000 Recall 48.148 F1 65.000 
+ * Acc@1 98.727. Acc@5 100.000. Precision 100.000 Recall 59.259 F1 74.419 
+ * Acc@1 99.190. Acc@5 100.000. Precision 100.000 Recall 74.074 F1 85.106 
+ * Acc@1 99.074. Acc@5 100.000. Precision 100.000 Recall 70.370 F1 82.609 
+ * Acc@1 99.074. Acc@5 100.000. Precision 100.000 Recall 70.370 F1 82.609 
+cuda available
+device cuda
+param: lr 0.001
+train class imbalance tensor([0.4998, 0.5002], device='cuda:0')
+Loaded 9162 train and 864 eval data:
+ * Acc@1 22.569. Acc@5 100.000. Precision 3.343 Recall 85.185 F1 6.434 
+ * Acc@1 93.403. Acc@5 100.000. Precision 12.500 Recall 18.519 F1 14.925 
+ * Acc@1 93.403. Acc@5 100.000. Precision 3.125 Recall 3.704 F1 3.390 
+ * Acc@1 92.014. Acc@5 100.000. Precision 2.273 Recall 3.704 F1 2.817 
+ * Acc@1 95.486. Acc@5 100.000. Precision 7.143 Recall 3.704 F1 4.878 
+ * Acc@1 95.370. Acc@5 100.000. Precision 27.586 Recall 29.630 F1 28.571 
+ * Acc@1 95.255. Acc@5 100.000. Precision 26.667 Recall 29.630 F1 28.070 
+ * Acc@1 95.370. Acc@5 100.000. Precision 30.303 Recall 37.037 F1 33.333 
+ * Acc@1 96.065. Acc@5 100.000. Precision 37.931 Recall 40.741 F1 39.286 
+ * Acc@1 97.454. Acc@5 100.000. Precision 69.231 Recall 33.333 F1 45.000 
+ * Acc@1 97.454. Acc@5 100.000. Precision 66.667 Recall 37.037 F1 47.619 
+ * Acc@1 97.801. Acc@5 100.000. Precision 90.000 Recall 33.333 F1 48.649 
+ * Acc@1 97.917. Acc@5 100.000. Precision 84.615 Recall 40.741 F1 55.000 
+ * Acc@1 97.917. Acc@5 100.000. Precision 84.615 Recall 40.741 F1 55.000 
+ * Acc@1 98.148. Acc@5 100.000. Precision 100.000 Recall 40.741 F1 57.895 
+ * Acc@1 98.264. Acc@5 100.000. Precision 100.000 Recall 44.444 F1 61.538 
+ * Acc@1 97.801. Acc@5 100.000. Precision 83.333 Recall 37.037 F1 51.282 
+ * Acc@1 98.148. Acc@5 100.000. Precision 92.308 Recall 44.444 F1 60.000 
+ * Acc@1 98.264. Acc@5 100.000. Precision 92.857 Recall 48.148 F1 63.415 
+ * Acc@1 98.611. Acc@5 100.000. Precision 94.118 Recall 59.259 F1 72.727 
+cuda available
+device cuda
+param: lr 0.0001
+train class imbalance tensor([0.4998, 0.5002], device='cuda:0')
+Loaded 9162 train and 864 eval data:
+ * Acc@1 22.569. Acc@5 100.000. Precision 3.343 Recall 85.185 F1 6.434 
+ * Acc@1 33.102. Acc@5 100.000. Precision 3.541 Recall 77.778 F1 6.774 
+ * Acc@1 72.569. Acc@5 100.000. Precision 6.250 Recall 55.556 F1 11.236 
+ * Acc@1 89.352. Acc@5 100.000. Precision 7.792 Recall 22.222 F1 11.538 
+ * Acc@1 95.370. Acc@5 100.000. Precision 6.667 Recall 3.704 F1 4.762 
+ * Acc@1 92.014. Acc@5 100.000. Precision 8.000 Recall 14.815 F1 10.390 
+ * Acc@1 94.329. Acc@5 100.000. Precision 4.167 Recall 3.704 F1 3.922 
+ * Acc@1 94.213. Acc@5 100.000. Precision 4.000 Recall 3.704 F1 3.846 
+ * Acc@1 91.782. Acc@5 100.000. Precision 2.174 Recall 3.704 F1 2.740 
+ * Acc@1 93.171. Acc@5 100.000. Precision 2.941 Recall 3.704 F1 3.279 
+ * Acc@1 92.940. Acc@5 100.000. Precision 2.778 Recall 3.704 F1 3.175 
+ * Acc@1 93.634. Acc@5 100.000. Precision 3.333 Recall 3.704 F1 3.509 
+---------------------------
+cuda available
+device cuda
+param: lr 0.01
+train class imbalance tensor([0.4998, 0.5002], device='cuda:0')
+Loaded 9162 train and 864 eval data:
+ * Acc@1 22.569. Acc@5 100.000. Precision 3.343 Recall 85.185 F1 6.434 
+ * Acc@1 95.023. Acc@5 100.000. Precision 10.000 Recall 7.407 F1 8.511 
+ * Acc@1 96.528. Acc@5 100.000. Precision 44.444 Recall 44.444 F1 44.444 
+ * Acc@1 97.569. Acc@5 100.000. Precision 63.636 Recall 51.852 F1 57.143 
+ * Acc@1 98.727. Acc@5 100.000. Precision 94.444 Recall 62.963 F1 75.556 
+ * Acc@1 98.727. Acc@5 100.000. Precision 100.000 Recall 59.259 F1 74.419 
+ * Acc@1 99.537. Acc@5 100.000. Precision 89.655 Recall 96.296 F1 92.857 
+ * Acc@1 99.537. Acc@5 100.000. Precision 96.000 Recall 88.889 F1 92.308 
+ * Acc@1 99.306. Acc@5 100.000. Precision 83.871 Recall 96.296 F1 89.655 
+ * Acc@1 98.495. Acc@5 100.000. Precision 100.000 Recall 51.852 F1 68.293 
+ * Acc@1 99.769. Acc@5 100.000. Precision 96.296 Recall 96.296 F1 96.296 
+ * Acc@1 98.611. Acc@5 100.000. Precision 94.118 Recall 59.259 F1 72.727 
+ * Acc@1 98.958. Acc@5 100.000. Precision 100.000 Recall 66.667 F1 80.000 
+ * Acc@1 98.380. Acc@5 100.000. Precision 93.333 Recall 51.852 F1 66.667 
+ * Acc@1 98.032. Acc@5 100.000. Precision 100.000 Recall 37.037 F1 54.054 
+ * Acc@1 98.495. Acc@5 100.000. Precision 93.750 Recall 55.556 F1 69.767 
+ * Acc@1 98.958. Acc@5 100.000. Precision 87.500 Recall 77.778 F1 82.353 
+ * Acc@1 99.074. Acc@5 100.000. Precision 95.238 Recall 74.074 F1 83.333 
+ * Acc@1 98.495. Acc@5 100.000. Precision 88.889 Recall 59.259 F1 71.111 
+ * Acc@1 98.495. Acc@5 100.000. Precision 93.750 Recall 55.556 F1 69.767 

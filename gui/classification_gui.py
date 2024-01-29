@@ -141,7 +141,7 @@ class ClassificationGUI(QMainWindow):
         """Load model"""
 
         model_name = "resnet18d"
-        model_path = "models/classifier_resnet18d_20240111-154528_8.pth.tar"
+        model_path = "models/classifier_resnet18d_20240118-150641_6.pth.tar"
 
         print("loading model", model_path)
         model = create_model(
