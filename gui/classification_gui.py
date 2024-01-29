@@ -85,8 +85,9 @@ class ClassificationGUI(QMainWindow):
             self.additional_sample_information_field.setPlainText("No additional data found")
 
     def baseline_classification(self):
-        """Predict image class with baseline model, based on h values"""
+        """Predict image class with baseline model, based on hue values"""
         
+        # case handling when no image is selected
         if self.selected_image_path.text() == "":
             msg = QMessageBox() 
             msg.setIcon(QMessageBox.Icon.Critical)
@@ -94,10 +95,12 @@ class ClassificationGUI(QMainWindow):
             msg.exec()
             return
         
+        # calc average hue value
         image = cv2.imread(self.selected_image_path.text())  
         hsv_image = matplotlib.colors.rgb_to_hsv(image / 255.0)
         average_h = np.mean(hsv_image[:, :, 0])
 
+        # predict and show image class based on average hue value
         pred_class = 1 if average_h > 0.6015 and average_h < 0.6057 or average_h > 0.6088 else 0
         image_classes = ["non Bleeding", "Bleeding"]
         self.baseline_prediction_field.setPlainText(image_classes[pred_class])
