@@ -70,7 +70,7 @@ Calculate and return mean h for all num_patches patches of the image
 """
 
 
-def mean_h_for_patches(img, num_patches) -> list[float]:
+def mean_h_for_patches(img, num_patches):
     patch_hs = []
     patch_size = img.shape[0] // num_patches
     for i in range(num_patches):

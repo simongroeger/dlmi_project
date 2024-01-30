@@ -280,7 +280,7 @@ if __name__ == '__main__' :
     # balance dataset
     copy_images_all(args.images_src + "/" + args.datadir, args.images_src+"/tmp")
 
-    create_splits(args.images_src+"/tmp", args.images_src, args.thresh, "csvs/splits_by_metric")
+    create_splits(args.images_src+"/tmp", args.images_src, args.thresh, "csvs/splits_by_video")
 
     fillup_splitted(args.images_src+"/"+train_split)
 
