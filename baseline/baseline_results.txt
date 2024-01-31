@@ -1,0 +1,55 @@
+
+decision_rule:
+    blood if average_h > 0.6015 and average_h < 0.6057 or average_h > 0.6088
+
+results:
+    train:
+        acc: 0.9507
+        precision: 0.5966
+        recall: 0.7508
+        f1score: 0.6649
+
+    validate:
+        acc: 0.9491
+        precision: 0.0
+        recall: 0.0
+        f1score: 0.0
+
+    test:
+        acc: 0.9597
+        precision: 0.2727
+        recall: 0.1579
+        f1score: 0.2
+
+test:
+    Performance for infere_masked_s
+     accuracy 0.75
+     precision 1.0
+     recall 0.06875
+     f1-score 0.1286549707602339
+
+    Performance for infere_masked_v
+         accuracy 0.6375838926174497
+         precision 1.0
+         recall 0.04845814977973569
+         f1-score 0.09243697478991598
+
+validation:
+    Performance for infere_masked_v
+         accuracy 0.6527777777777778
+         precision 1.0
+         recall 0.08256880733944955
+         f1-score 0.15254237288135594
+    Performance for infere_masked_s
+         accuracy 0.6875
+         precision 1.0
+         recall 0.09090909090909091
+         f1-score 0.16666666666666669
+    Performance for infer_combined
+         accuracy 0.6967592592592593
+         precision 1.0
+         recall 0.09342560553633218
+         f1-score 0.17088607594936708
+
+
+
