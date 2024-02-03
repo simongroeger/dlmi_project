@@ -11,19 +11,41 @@ def infere_h(average_h):
     return (0, "blood") if (average_h > 0.6015 and average_h < 0.6057) or average_h > 0.6088 else (1, "other")
 
 
+# No FN
 def infere_masked_s(average_s):
     return (0, "blood") if average_s > 0.5968 and average_s < 0.8154 else (1, "other")
-
-
 def infere_masked_v(average_v):
     return (0, "blood") if average_v > 0.2519 and average_v < 0.6819 else (1, "other")
+def infere_masked_h(average_h):
+    return (0, "blood") if average_h > 0.6351 and average_h < 0.6569 else (1, "other")
+def infer_combined(averag_hvss: list):
+    return (0, "blood") if (infere_masked_h(averag_hvss[0])[0] == 0 and
+                            infere_masked_s(averag_hvss[1])[0] == 0 and
+                            infere_masked_v(averag_hvss[2])[0] == 0) else (1, "other")
 
+# Allowing FN (first occurence where p(b) >=  p(n) - last occurence where P(b) >= P(n))
+def geq_infere_masked_s(average_s):
+    return (0, "blood") if average_s > 0.5191 and average_s < 0.7134 else (1, "other")
+def geq_infere_masked_v(average_v):
+    return (0, "blood") if average_v > 0.4370 and average_v < 0.5803 else (1, "other")
+def geq_infere_masked_h(average_h):
+    return (0, "blood") if average_h > 0.6458 and average_h < 0.6498 else (1, "other")
+def geq_infer_combined(averag_hsvs: list):
+    return (0, "blood") if (geq_infere_masked_h(averag_hsvs[0])[0] == 0 and
+                            geq_infere_masked_s(averag_hsvs[1])[0] == 0 and
+                            geq_infere_masked_v(averag_hsvs[2])[0] == 0) else (1, "other")
 
-def infer_combined(averag_vs: list):
-    return (0, "blood") if infere_masked_s(averag_vs[0])[0] == 0 and infere_masked_v(averag_vs[1])[0] == 0 else (
-    1, "other")
-
-
+# Allowing FN (first occurence where p(b) >  p(n) - last occurence where P(b) >= P(n))
+def g_infere_masked_s(average_s):
+    return (0, "blood") if average_s > 0.6162 and average_s < 0.6697 else (1, "other")
+def g_infere_masked_v(average_v):
+    return (0, "blood") if average_v > 0.4370 and average_v < 0.5803 else (1, "other")
+def g_infere_masked_h(average_h):
+    return (0, "blood") if average_h > 0.6458 and average_h < 0.6491 else (1, "other")
+def g_infer_combined(averag_hsvs: list):
+    return (0, "blood") if (g_infere_masked_h(averag_hsvs[0])[0] == 0 and
+                            g_infere_masked_s(averag_hsvs[1])[0] == 0 and
+                            g_infere_masked_v(averag_hsvs[2])[0] == 0) else (1, "other")
 def validate_for_hsv_index(hsv_indices, pred_functions, split):
     src_dir = "../pytorch-image-models/images"
 
@@ -77,7 +99,7 @@ def validate_for_hsv_index(hsv_indices, pred_functions, split):
 
 if __name__ == "__main__":
     validate_for_hsv_index(
-        [[1], [2], [1, 2]],
-        [infere_masked_s, infere_masked_v, infer_combined],
+        [[0], [1], [2], [0, 1, 2]],
+        [g_infere_masked_h, g_infere_masked_s, g_infere_masked_v, geq_infer_combined],
         "val_split"
     )
