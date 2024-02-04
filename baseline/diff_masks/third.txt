@@ -1,0 +1,151 @@
+boundaries
+hue lower boundary 0.6342666172589139
+hue upper boundary 0.6576017132361239
+hue lower bayesian boundary 0.6459341652475189
+hue upper bayesian boundary 0.6496186540860258
+saturation lower boundary 0.6538962821013847
+saturation upper boundary 0.8306300954964223
+saturation lower bayesian boundary 0.6943977810044142
+saturation upper bayesian boundary 0.7312173254617136
+value lower boundary 0.2812060082182355
+value upper boundary 0.6451055162030499
+value lower bayesian boundary 0.42456035984861695
+value upper bayesian boundary 0.5734283403878592
+
+all
+
+[[ 27. 374.]
+ [  0. 463.]]
+Performance for g_infere_masked_h3
+ accuracy 0.5671296296296297
+ precision 0.06733167082294264
+ recall 1.0
+ f1-score 0.12616822429906543
+
+[[ 27. 212.]
+ [  0. 625.]]
+Performance for g_infere_masked_s3
+ accuracy 0.7546296296296297
+ precision 0.11297071129707113
+ recall 1.0
+ f1-score 0.2030075187969925
+
+[[ 25. 266.]
+ [  2. 571.]]
+Performance for g_infere_masked_v3
+ accuracy 0.6898148148148148
+ precision 0.0859106529209622
+ recall 0.9259259259259259
+ f1-score 0.15723270440251572
+
+[[ 27. 396.]
+ [  0. 441.]]
+Performance for g_infer_combined3
+ accuracy 0.5416666666666666
+ precision 0.06382978723404255
+ recall 1.0
+ f1-score 0.12
+
+bayes
+
+[[  9.  24.]
+ [ 18. 813.]]
+Performance for gb_infere_masked_h3
+ accuracy 0.9513888888888888
+ precision 0.2727272727272727
+ recall 0.3333333333333333
+ f1-score 0.3
+
+[[  5.  32.]
+ [ 22. 805.]]
+Performance for gb_infere_masked_s3
+ accuracy 0.9375
+ precision 0.13513513513513514
+ recall 0.18518518518518517
+ f1-score 0.15625
+
+[[  1. 165.]
+ [ 26. 672.]]
+Performance for gb_infere_masked_v3
+ accuracy 0.7789351851851852
+ precision 0.006024096385542169
+ recall 0.037037037037037035
+ f1-score 0.010362694300518135
+
+[[ 12. 194.]
+ [ 15. 643.]]
+Performance for gb_infer_combined3
+ accuracy 0.7581018518518519
+ precision 0.05825242718446602
+ recall 0.4444444444444444
+ f1-score 0.10300429184549356
+-------------test--------------
+all
+
+[[  7. 577.]
+ [ 15. 593.]]
+Performance for g_infere_masked_h3
+ accuracy 0.5033557046979866
+ precision 0.011986301369863013
+ recall 0.3181818181818182
+ f1-score 0.0231023102310231
+
+[[  3. 199.]
+ [ 19. 971.]]
+Performance for g_infere_masked_s3
+ accuracy 0.8171140939597316
+ precision 0.01485148514851485
+ recall 0.13636363636363635
+ f1-score 0.02678571428571428
+
+[[ 22. 323.]
+ [  0. 847.]]
+Performance for g_infere_masked_v3
+ accuracy 0.7290268456375839
+ precision 0.06376811594202898
+ recall 1.0
+ f1-score 0.11989100817438693
+
+[[ 22. 606.]
+ [  0. 564.]]
+Performance for g_infer_combined3
+ accuracy 0.49161073825503354
+ precision 0.03503184713375796
+ recall 1.0
+ f1-score 0.06769230769230769
+
+bayes
+
+[[   0.   64.]
+ [  22. 1106.]]
+Performance for gb_infere_masked_h3
+ accuracy 0.9278523489932886
+ precision 0.0
+ recall 0.0
+ f1-score nan
+
+[[   0.   25.]
+ [  22. 1145.]]
+Performance for gb_infere_masked_s3
+ accuracy 0.9605704697986577
+ precision 0.0
+ recall 0.0
+ f1-score nan
+
+[[  22.   77.]
+ [   0. 1093.]]
+Performance for gb_infere_masked_v3
+ accuracy 0.9354026845637584
+ precision 0.2222222222222222
+ recall 1.0
+ f1-score 0.3636363636363636
+
+[[  22.  159.]
+ [   0. 1011.]]
+Performance for gb_infer_combined3
+ accuracy 0.8666107382550335
+ precision 0.12154696132596685
+ recall 1.0
+ f1-score 0.21674876847290642
+
+Process finished with exit code 0

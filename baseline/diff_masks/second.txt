@@ -1,0 +1,184 @@
+boundaries
+hue lower boundary 0.634708412348297
+hue upper boundary 0.6572095249107834
+hue lower bayesian boundary 0.6459589686295402
+hue upper bayesian boundary 0.6492679557710823
+saturation lower boundary 0.5739228798023852
+saturation upper boundary 0.808999911635552
+saturation lower bayesian boundary 0.5739228798023852
+saturation upper bayesian boundary 0.613102385107913
+value lower boundary 0.23903687983342248
+value upper boundary 0.6700271421235047
+value lower bayesian boundary 0.42541104731021473
+value upper bayesian boundary 0.5768400583851084
+
+performance
+-------------val--------------
+
+[[ 27. 399.]
+ [  0. 438.]]
+Performance for g_infere_masked_h2
+ accuracy 0.5381944444444444
+ precision 0.06338028169014084
+ recall 1.0
+ f1-score 0.11920529801324505
+
+[[ 27. 279.]
+ [  0. 558.]]
+Performance for g_infere_masked_s2
+ accuracy 0.6770833333333334
+ precision 0.08823529411764706
+ recall 1.0
+ f1-score 0.1621621621621622
+
+[[ 27. 343.]
+ [  0. 494.]]
+Performance for g_infere_masked_v2
+ accuracy 0.6030092592592593
+ precision 0.07297297297297298
+ recall 1.0
+ f1-score 0.13602015113350127
+
+[[ 27. 441.]
+ [  0. 396.]]
+Performance for g_infer_combined2
+ accuracy 0.4895833333333333
+ precision 0.057692307692307696
+ recall 1.0
+ f1-score 0.1090909090909091
+
+bayes
+
+[[  5.  19.]
+ [ 22. 818.]]
+Performance for gb_infere_masked_h2
+ accuracy 0.9525462962962963
+ precision 0.20833333333333334
+ recall 0.18518518518518517
+ f1-score 0.19607843137254902
+
+[[  0.  10.]
+ [ 27. 827.]]
+Performance for gb_infere_masked_s2
+ accuracy 0.9571759259259259
+ precision 0.0
+ recall 0.0
+ f1-score nan
+
+[[  3. 215.]
+ [ 24. 622.]]
+Performance for gb_infere_masked_v2
+ accuracy 0.7233796296296297
+ precision 0.013761467889908258
+ recall 0.1111111111111111
+ f1-score 0.02448979591836735
+
+[[  8. 243.]
+ [ 19. 594.]]
+Performance for gb_infer_combined2
+ accuracy 0.6967592592592593
+ precision 0.03187250996015936
+ recall 0.2962962962962963
+ f1-score 0.05755395683453238
+-------------test--------------
+all
+
+[[  2. 636.]
+ [ 20. 534.]]
+Performance for g_infere_masked_h2
+ accuracy 0.44966442953020136
+ precision 0.003134796238244514
+ recall 0.09090909090909091
+ f1-score 0.006060606060606061
+
+[[ 22. 329.]
+ [  0. 841.]]
+Performance for g_infere_masked_s2
+ accuracy 0.7239932885906041
+ precision 0.06267806267806268
+ recall 1.0
+ f1-score 0.11796246648793565
+
+[[ 22. 513.]
+ [  0. 657.]]
+Performance for g_infere_masked_v2
+ accuracy 0.5696308724832215
+ precision 0.041121495327102804
+ recall 1.0
+ f1-score 0.07899461400359066
+
+[[ 22. 686.]
+ [  0. 484.]]
+Performance for g_infer_combined2
+ accuracy 0.42449664429530204
+ precision 0.031073446327683617
+ recall 1.0
+ f1-score 0.06027397260273973
+
+bayes
+
+[[   0.   71.]
+ [  22. 1099.]]
+Performance for gb_infere_masked_h2
+ accuracy 0.9219798657718121
+ precision 0.0
+ recall 0.0
+ f1-score nan
+
+[[  18.   85.]
+ [   4. 1085.]]
+Performance for gb_infere_masked_s2
+ accuracy 0.9253355704697986
+ precision 0.17475728155339806
+ recall 0.8181818181818182
+ f1-score 0.28800000000000003
+
+[[  20.  106.]
+ [   2. 1064.]]
+Performance for gb_infere_masked_v2
+ accuracy 0.9093959731543624
+ precision 0.15873015873015872
+ recall 0.9090909090909091
+ f1-score 0.2702702702702703
+
+[[ 22. 234.]
+ [  0. 936.]]
+Performance for gb_infer_combined2
+ accuracy 0.8036912751677853
+ precision 0.0859375
+ recall 1.0
+ f1-score 0.15827338129496402
+
+ ----------------- train --------------------
+
+[[ 409. 1533.]
+ [   0. 3046.]]
+Performance for g_infere_masked_h3
+ accuracy 0.6926623897353649
+ precision 0.2106076210092688
+ recall 1.0
+ f1-score 0.3479370480646533
+
+[[ 409. 1098.]
+ [   0. 3481.]]
+Performance for g_infere_masked_s3
+ accuracy 0.7798716920609463
+ precision 0.2714001327140013
+ recall 1.0
+ f1-score 0.42693110647181626
+
+[[ 409. 1044.]
+ [   0. 3535.]]
+Performance for g_infere_masked_v3
+ accuracy 0.7906976744186046
+ precision 0.2814865794907089
+ recall 1.0
+ f1-score 0.439312567132116
+
+[[ 409. 1591.]
+ [   0. 2988.]]
+Performance for g_infer_combined3
+ accuracy 0.6810344827586207
+ precision 0.2045
+ recall 1.0
+ f1-score 0.33955998339559984

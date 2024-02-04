@@ -7,7 +7,12 @@ import cv2
 import matplotlib
 import numpy as np
 import torch
+
 from timm.models import create_model
+
+from baseline.validate_baseline import g_infere_masked_s
+from baseline.derive_baseline import Baseline
+from baseline.helpers import BaselineHelper
 
 
 
@@ -28,6 +33,8 @@ class ClassificationGUI(QMainWindow):
         self.select_sample_Button.clicked.connect(self.select_sample)
         self.baseline_classification_Button.clicked.connect(self.baseline_classification)
         self.nn_classification_Button.clicked.connect(self.nn_classification)
+
+        self.pred_function = g_infere_masked_s
 
     def select_sample(self):
         """Select image sample from explorer"""
@@ -64,18 +71,18 @@ class ClassificationGUI(QMainWindow):
         df["finding_class2"] = df["finding_class2"].str.replace("-", "")
         df["finding_class2"] = df["finding_class2"].str.lower()
         d = df[df["filename"].str.match(fname) & df["finding_class2"].str.match(image_class)]
-        
+
         # get data set type for selected image path
             # load dfs with train, val, test separation
-        train_split = pd.read_csv("csvs/splits_by_video/train_split.csv", sep=';')
-        test_split = pd.read_csv("csvs/splits_by_video/test_split.csv", sep=';')
-        val_split = pd.read_csv("csvs/splits_by_video/val_split.csv", sep=';')
+        train_split = pd.read_csv("../csvs/splits_by_video/train_split.csv", sep=';')
+        test_split = pd.read_csv("../csvs/splits_by_video/test_split.csv", sep=';')
+        val_split = pd.read_csv("../csvs/splits_by_video/val_split.csv", sep=';')
             # convert current data to identifier
         split_imge_classes = {'normalcleanmucosa': 'Normal', 'ileocecalvalve': 'Ileo-cecal valve', 'pylorus': 'Pylorus', 'erosion': 'Erosion', 'reducedmucosalview': 'Reduced Mucosal View', 'angiectasia': 'Angiectasia', 'ampullaofvater': 'Ampulla,', 'erythema': 'Erythematous', 'bloodfresh': 'Blood', 'bloodhematin': 'Blood', 'foreignbody': 'Foreign Bodies', 'ulcer': 'Ulcer', 'polyp': 'Polyp', 'lymphangiectasia': 'Lymphangiectasia'}
         image_idf = fname + ',' + split_imge_classes[image_class]
             # get dataset
         in_dataset = "train set" if image_idf in set(train_split['filename,label']) else "test set" if image_idf in set(test_split['filename,label']) else "val set" if image_idf in set(val_split['filename,label']) else "None"
-        
+
         # update add data field
         if not d.empty:
             data = "filename: {0}\nvideo ID: {1}\nframe number: {2}\nfinding category: {3}\nfinding class: {4}\ndata set: {5}\nx1: {6}\ny1: {7}\nx2: {8}\ny2: {9}\nx3: {10}\ny3: {11}\nx4: {12}\ny4: {13}"\
@@ -96,14 +103,15 @@ class ClassificationGUI(QMainWindow):
             return
         
         # calc average hue value
-        image = cv2.imread(self.selected_image_path.text())  
-        hsv_image = matplotlib.colors.rgb_to_hsv(image / 255.0)
-        average_h = np.mean(hsv_image[:, :, 0])
-
-        # predict and show image class based on average hue value
-        pred_class = 1 if average_h > 0.6015 and average_h < 0.6057 or average_h > 0.6088 else 0
-        image_classes = ["non Bleeding", "Bleeding"]
-        self.baseline_prediction_field.setPlainText(image_classes[pred_class])
+        img = cv2.imread(self.selected_image_path.text())
+        hsv_image = matplotlib.colors.rgb_to_hsv(img / 255.0)
+        mean = Baseline.get_masked_means(hsv_image, BaselineHelper.First_try, [np.nanmean]*3)[2] # use mean saturation for prediction
+        pred_cls = self.pred_functions(mean)
+        if pred_cls == "blood":
+            classification = "non Bleeding"
+        else:
+            classification = "Bleeding"
+        self.baseline_prediction_field.setPlainText(classification)
 
     def nn_classification(self):
         """Predict image class with neural network model"""
@@ -141,7 +149,7 @@ class ClassificationGUI(QMainWindow):
         """Load model"""
 
         model_name = "resnet18d"
-        model_path = "models/classifier_resnet18d_20240118-150641_6.pth.tar"
+        model_path = "../models/classifier_resnet18d_20240118-150641_6.pth.tar"
 
         print("loading model", model_path)
         model = create_model(
