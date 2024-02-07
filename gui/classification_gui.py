@@ -105,9 +105,9 @@ class ClassificationGUI(QMainWindow):
         # calc average hue value
         img = cv2.imread(self.selected_image_path.text())
         hsv_image = matplotlib.colors.rgb_to_hsv(img / 255.0)
-        mean = Baseline.get_masked_means(hsv_image, BaselineHelper.First_try, [np.nanmean]*3)[2] # use mean saturation for prediction
-        pred_cls = self.pred_functions(mean)
-        if pred_cls == "blood":
+        mean = Baseline.get_masked_means(hsv_image, BaselineHelper.First_try, [np.nanmean]*3)[1] # use mean saturation for prediction
+        pred_cls = self.pred_function(mean)[1]
+        if pred_cls == "other":
             classification = "non Bleeding"
         else:
             classification = "Bleeding"

@@ -151,34 +151,10 @@ Performance for gb_infer_combined2
 
  ----------------- train --------------------
 
-[[ 409. 1533.]
- [   0. 3046.]]
-Performance for g_infere_masked_h3
- accuracy 0.6926623897353649
- precision 0.2106076210092688
+[[ 409. 1266.]
+ [   0. 3313.]]
+Performance for g_infere_masked_s2
+ accuracy 0.7461908580593424
+ precision 0.24417910447761193
  recall 1.0
- f1-score 0.3479370480646533
-
-[[ 409. 1098.]
- [   0. 3481.]]
-Performance for g_infere_masked_s3
- accuracy 0.7798716920609463
- precision 0.2714001327140013
- recall 1.0
- f1-score 0.42693110647181626
-
-[[ 409. 1044.]
- [   0. 3535.]]
-Performance for g_infere_masked_v3
- accuracy 0.7906976744186046
- precision 0.2814865794907089
- recall 1.0
- f1-score 0.439312567132116
-
-[[ 409. 1591.]
- [   0. 2988.]]
-Performance for g_infer_combined3
- accuracy 0.6810344827586207
- precision 0.2045
- recall 1.0
- f1-score 0.33955998339559984
+ f1-score 0.3925143953934741

@@ -11,7 +11,7 @@ from baseline.helpers import BaselineHelper
 # def infere_h(average_h):
 #     return (0, "blood") if (average_h > 0.6015 and average_h < 0.6057) or average_h > 0.6088 else (1, "other")
 
-# First Try (1 = bayesian, 2 = no FN, 3 = mix)
+# -- First Try --
 def g_infere_masked_h(average_h):
     return (0, "blood") if average_h > 0.6350 and average_h < 0.6568 else (1, "other")
 def g_infere_masked_s(average_s):
@@ -22,6 +22,7 @@ def g_infer_combined(averag_hsvs: list):
     return (0, "blood") if (g_infere_masked_h(averag_hsvs[0])[0] == 0 or
                             g_infere_masked_v(averag_hsvs[0])[0] == 0 or
                             g_infere_masked_s(averag_hsvs[1])[0] == 0) else (1, "other")
+# using bayesian inspired borders
 def gb_infere_masked_h(average_h):
     return (0, "blood") if average_h > 0.6457 and average_h < 0.6494 else (1, "other")
 def gb_infere_masked_s(average_s):
@@ -33,7 +34,7 @@ def gb_infer_combined(averag_hsvs: list):
                             gb_infere_masked_v(averag_hsvs[0])[0] == 0 or
                             gb_infere_masked_s(averag_hsvs[1])[0] == 0) else (1, "other")
 
-# Second Try (1 = bayesian, 2 = no FN, 3 = mix)
+# -- Second Try --
 def g_infere_masked_h2(average_h):
     return (0, "blood") if average_h > 0.6347 and average_h < 0.6572 else (1, "other") #lb - u
 def g_infere_masked_s2(average_s):
@@ -44,7 +45,7 @@ def g_infer_combined2(averag_hsvs: list):
     return (0, "blood") if (g_infere_masked_h2(averag_hsvs[0])[0] == 0 or
                             g_infere_masked_v2(averag_hsvs[2])[0] == 0 or
                             g_infere_masked_s2(averag_hsvs[1])[0] == 0) else (1, "other")
-
+# using bayesian inspired borders
 def gb_infere_masked_h2(average_h):
     return (0, "blood") if average_h > 0.6459 and average_h < 0.6492 else (1, "other") #lb - u
 def gb_infere_masked_s2(average_s):
@@ -55,7 +56,7 @@ def gb_infer_combined2(averag_hsvs: list):
     return (0, "blood") if (gb_infere_masked_h2(averag_hsvs[0])[0] == 0 or
                             gb_infere_masked_v2(averag_hsvs[2])[0] == 0 or
                             gb_infere_masked_s2(averag_hsvs[1])[0] == 0) else (1, "other")
-# Third Try (1 = bayesian, 2 = no FN, 3 = mix)
+# -- Third Try --
 def g_infere_masked_h3(average_h):
     return (0, "blood") if average_h > 0.6342 and average_h < 0.6576 else (1, "other") #lb - u
 def g_infere_masked_s3(average_s):
@@ -67,6 +68,7 @@ def g_infer_combined3(averag_hsvs: list):
                             g_infere_masked_v3(averag_hsvs[2])[0] == 0 or
                             g_infere_masked_s3(averag_hsvs[1])[0] == 0) else (1, "other")
 
+# using bayesian inspired borders
 def gb_infere_masked_h3(average_h):
     return (0, "blood") if average_h > 0.6459 and average_h < 0.6496 else (1, "other") #lb - u
 def gb_infere_masked_s3(average_s):
@@ -79,6 +81,9 @@ def gb_infer_combined3(averag_hsvs: list):
                             gb_infere_masked_s3(averag_hsvs[1])[0] == 0) else (1, "other")
 
 
+"""
+Calculate metrics
+"""
 def validate_for_hsv_index(hsv_indices, pred_functions, split, mask, extract_methods):
     src_dir = "../pytorch-image-models/images"
 
@@ -108,7 +113,7 @@ def validate_for_hsv_index(hsv_indices, pred_functions, split, mask, extract_met
                 pred_i, pred_cls = pred_functions[j](mean)
                 res[j, pred_i, cls_i] += 1
                 class_count[j, cls_i] += 1
-                # print(pred_cls)
+                print(pred_cls)
 
     for i, index in enumerate(hsv_indices):
         print()
@@ -132,19 +137,12 @@ def validate_for_hsv_index(hsv_indices, pred_functions, split, mask, extract_met
 
 if __name__ == "__main__":
     m = BaselineHelper.First_try
-    clfs_all = [g_infere_masked_h3, g_infere_masked_s3, g_infere_masked_v3, g_infer_combined3]
+    clfs_all = [g_infere_masked_s]
     validate_for_hsv_index(
-        [[0], [1], [2], [0, 1, 2]],
+        [[1]],
         clfs_all,
         "train_split",
         m,
         [np.nanmean, np.nanmean, np.nanmean]
     )
-    m = BaselineHelper.Second_try
-    validate_for_hsv_index(
-        [[0], [1], [2], [0, 1, 2]],
-        clfs_all,
-        "train_split",
-        m,
-        [np.nanmean, np.nanmean, np.nanmean]
-    )
+

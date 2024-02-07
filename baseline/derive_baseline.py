@@ -63,8 +63,8 @@ class Baseline:
         indices = [i for i, (val1, val2) in enumerate(zip(posteriors["blood"], posteriors["other"])) if
                    comp(val1, val2)]
         bayesian_boundaries = [bins[min(indices, default=0)], bins[max(indices, default=0) + 1]]
-        ax[2].axvline(bayesian_boundaries[0], color="lightgreen", label="bayesian decision boundary")
-        ax[2].axvline(bayesian_boundaries[1], color="green")
+        ax[2].axvline(bayesian_boundaries[0], color="mediumseagreen", label="bayesian decision boundary")
+        ax[2].axvline(bayesian_boundaries[1], color="seagreen")
         print(value_description, "lower bayesian boundary", bayesian_boundaries[0])
         print(value_description, "upper bayesian boundary", bayesian_boundaries[1])
 
@@ -77,8 +77,11 @@ class Baseline:
             ax[i].set_ylabel("probability density")
             ax[i].legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
-        plt.subplots_adjust(hspace=1)
+        plt.subplots_adjust(hspace=2)
+        plt.savefig(value_description + '.png')
         plt.show()
+
+
 
     """
     Mask given image by removing all non-red pixels
@@ -133,10 +136,10 @@ class Baseline:
 
 if __name__ == "__main__":
     src_dir = "../pytorch-image-models/images"
-    split = "train_split"
-    # mask = BaselineHelper.First_try
+    split = "test_split"
+    mask = BaselineHelper.First_try
     # mask = BaselineHelper.Second_try
-    mask = BaselineHelper.Third_try
+    # mask = BaselineHelper.Third_try
     comparator = BaselineHelper.greater
     cls_folder_list = os.listdir(os.path.join(src_dir, split))
     extract_methods = [np.nanmean, np.nanmean, np.nanmean]
